@@ -1,0 +1,12 @@
+.error {
+    &-input {
+        & > .gc-input-control {
+            background:$alert-red-alpha;
+        }
+    }
+
+    &-message {
+        font-size:pxToRem(14);
+        color:$alert-red;
+    }
+}
