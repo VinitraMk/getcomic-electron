@@ -1,5 +1,12 @@
 /* Sass imports for common class */
-
+@import "./common/variables";
+@import "./common/functions";
+@import "./common/mixin";
+@import "./common/colors";
+@import "./common/resets";
 
 /* Sass imports for layouts */
-@import "./layouts/body";
+@import "./layouts/root";
+
+/* Sass import for utilties */
+@import "./common/utilities";

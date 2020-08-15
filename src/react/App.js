@@ -1,6 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
 import {channels} from "../shared/constants";
 const {ipcRenderer} = window;
 
@@ -8,10 +6,6 @@ export class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      appName:'',
-      appVersion:''
-    };
 
     ipcRenderer.send(channels.APP_INFO);
     ipcRenderer.on(channels.APP_INFO, (event, arg) => {
@@ -22,9 +16,9 @@ export class App extends React.Component {
   }
 
   render() {
-    const {appName,appVersion} = this.state;
     return (
       <div className="gc-root">
+        <p>Hello World</p>
       </div>
     );
   }
