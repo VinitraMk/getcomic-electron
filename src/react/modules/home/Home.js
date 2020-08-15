@@ -2,17 +2,21 @@ import React from "react";
 import Loader from "../../components/loader/Loader";
 import {isUrlValid} from "../../utilities/UrlValidators";
 
+const scraper = window.scraper;
+
 export default class Home extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             url:"",
             showLoader:false,
-            isUrlInvalid:false
+            isUrlInvalid:false,
+            urlResponse:""
         }
         this.searchForComics = this.searchForComics.bind(this);
         this.onUrlChange = this.onUrlChange.bind(this);
     }
+
 
     searchForComics(e) {
         //console.log(this.state.url);
@@ -25,9 +29,12 @@ export default class Home extends React.Component {
 
         if(res.isValid) {
             console.log(res);
-            this.setState({
-                showLoader:false
-            })
+            console.log(window.scraper,scraper);
+            scraper.onSubmit(this.state.url,res.comicName);
+            //getSourceCode(res.modifiedUrl);
+            //this.setState({
+                //showLoader:false
+            //})
         }
         else {
             this.setState({
