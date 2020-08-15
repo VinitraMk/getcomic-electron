@@ -81,3 +81,10 @@
   -ms-transform: rotate($val);
   transform: rotate($val);
 }
+
+@mixin container-all-center() {
+  display: flex;
+  flex-flow:column;
+  justify-content: center;
+  align-items: center;
+}

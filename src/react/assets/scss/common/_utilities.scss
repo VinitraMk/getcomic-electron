@@ -6,26 +6,9 @@
     color: $white;
   }
   &--red {
-    color: nth($red, 1);
+    color: $color-primary;
   }
-  &--grey {
-    color: map-get($gray,"747487");
-  }
-  &--blue {
-    color: map-get($blue,"1996FF")
-  }
-  &--lightgrey {
-    color: rgb(175, 175, 175);
-  }
-  &--purple {
-    color: #{$purple};
-  }
-  &--dblue {
-    color: map-get($blue,"28056B");
-  }
-  &--pink {
-    color: #{$pink};
-  }
+  
 }
 
 
@@ -235,7 +218,7 @@ $spacer: 5px;
       border-top: 0;
     }
     &-1 {
-      border-top: 1px solid map-get($gray,"F9F9FA");
+      border-top: 1px solid map-get($gray,"CCCCCC");
     }
   }
 
@@ -265,28 +248,6 @@ $spacer: 5px;
   }
 }
 
-//
-// Utilities - background color 
-//
-
-.bg {
-  &--grey {
-    background: map-get($gray,"F9F9FA");
-    border: 0.5px solid map-get($gray,"F1F1F3");
-  }
-  &--white {
-    background:#{$white};
-  }
-}
-
-//
-// Utilities - Border color
-//
-.border {
-  &--error {
-    border:1.5px solid nth($red,1);
-  }
-}
 
 //
 // Utilities - Vertical Align
@@ -664,186 +625,4 @@ $spacer: 5px;
 
 .hidden {
   display: none !important;
-}
-
-.fa,
-.fas,
-.far {
-  &--primary {
-    // color: map-get($theme, primary );
-    color: transparent;
-  }
-  &--blue {
-    color: map-get($blue,"00BCF2");
-  }
-  &--yellow {
-    color: #{$yellow};
-  }
-  &--grey {
-    color: map-get($gray,"CCCCCC");
-  }
-  // &--success{
-  // 	color: $success;
-  // }
-  // &--error{
-  // 	color: $error;
-  // }
-  // &--warning{
-  // 	color: $warning;
-  // }
-
-  &--white {
-    color: white;
-  }
-
-  &--mob {
-    display: none;
-  }
-}
-
-.abs {
-  &-t-50 {
-    position: absolute;
-    top: 50%;
-  }
-
-  &-l-45 {
-    position: absolute;
-    left: 45%;
-  }
-}
-
-//Additional padding classes
-
-.p-b-20 {
-  padding-bottom: pxToRem(100);
-}
-
-.p-b-24 {
-  padding-bottom: pxToRem(120);
-}
-
-//No Scroll
-
-.no-scroll {
-  overflow: hidden;
-}
-
-.lg-only {
-  
-}
-
-.xs-only {
-  display: none;
-}
-
-.sm-only {
-  display: none;
-}
-
-
-@media #{$viewportMobTabDevices}{
-
-  .lg-only {
-    display: none;
-  }
-    
-  .xs-only {
-    display: none;
-  }
-
-  .sm-only {
-    display: inline-block;
-  }
-
-  @each $box in a, x, y, t, b, l, r {
-    @for $i from 0 through 20 {
-      .xs-m-#{$box}-#{$i} {
-        @if $box == "a" {
-          margin: ($spacer * $i)!important;
-        }
-
-        @if $box == "x" {
-          margin-left: ($spacer * $i)!important;
-          margin-right: ($spacer * $i)!important;
-        }
-
-        @if $box == "y" {
-          margin-top: ($spacer * $i)!important;
-          margin-bottom: ($spacer * $i)!important;
-        }
-
-        @if $box == "t" {
-          margin-top: ($spacer * $i) !important;
-        }
-
-        @if $box == "b" {
-          margin-bottom: ($spacer * $i) !important;
-        }
-
-        @if $box == "l" {
-          margin-left: ($spacer * $i)!important;
-        }
-
-        @if $box == "r" {
-          margin-right: ($spacer * $i) !important;
-        }
-      }
-
-      .xs-p-#{$box}-#{$i} {
-        @if $box == "a" {
-          padding: ($spacer * $i) !important;
-        }
-
-        @if $box == "x" {
-          padding-left: ($spacer * $i)!important;
-          padding-right: ($spacer * $i)!important;
-        }
-
-        @if $box == "y" {
-          padding-top: ($spacer * $i)!important;
-          padding-bottom: ($spacer * $i)!important;
-        }
-
-        @if $box == "t" {
-          padding-top: ($spacer * $i)!important;
-        }
-
-        @if $box == "b" {
-          padding-bottom: ($spacer * $i)!important;
-        }
-
-        @if $box == "l" {
-          padding-left: ($spacer * $i) !important;
-        }
-
-        @if $box == "r" {
-          padding-right: ($spacer * $i)!important;
-        }
-      }
-    }
-  }
-}
-
-@media #{$viewportMobDevices}{
-  
-  .lg-only {
-    display: none;
-  }
-    
-  .xs-only {
-    display: inline-block;
-  }
-
-  .sm-only {
-    display: none;
-  }
-}
-
-.clearfix{
-  &:after{
-    content: "";
-    clear: both;
-    display: block;
-  }
 }

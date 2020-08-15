@@ -1,1 +1,18 @@
-@import "./react/assets/scss/style.scss";
+/* Sass imports for common class */
+@import "./react/assets/scss/common/variables";
+@import "./react/assets/scss/common/functions";
+@import "./react/assets/scss/common/mixin";
+@import "./react/assets/scss/common/colors";
+@import "./react/assets/scss/common/resets";
+
+/* Sass imports for components */
+@import "./react/assets/scss/components/input-controls";
+@import "./react/assets/scss/components/buttons";
+@import "./react/assets/scss/components/loader";
+
+/* Sass imports for layouts */
+@import "./react/assets/scss/layouts/root";
+@import "./react/assets/scss/layouts/container";
+
+/* Sass import for utilties */
+@import "./react/assets/scss/common/utilities";

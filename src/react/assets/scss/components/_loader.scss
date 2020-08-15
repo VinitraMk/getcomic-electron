@@ -1,0 +1,57 @@
+#{$gc} {
+    &-loader {
+        height:100%;
+        width:100%;
+        position: fixed;
+        top:0;
+        left:0;
+        background:rgba(255,255,255,0.75);
+
+        &-content {
+            width:pxToRem(350);
+            height:pxToRem(300);
+            position: absolute;
+            transform: translate(-50%,-50%);
+            top:50%;
+            left:45%;
+            background:$white;
+        }
+
+        &__spinner {
+            background:inherit;
+            border:pxToRem(16) solid map-get($gray,"F3F3F3");
+            border-radius:50%;
+            border-top:pxToRem(16) solid $color-primary;
+            width:pxToRem(120);
+            height:pxToRem(120);
+            -webkit-animation: spin 2s linear infinite;
+            animation:spin 2s linear infinite;
+            margin:pxToRem(40) auto;
+        }
+
+        &__message {
+            color:$color-primary;
+            font-size:pxToRem(23);
+            text-align: center;
+        }
+    }
+
+    @-webkit-keyframes spin {
+        0% {
+            -webkit-transform:rotate(0deg);
+        }
+        100% {
+            -webkit-transform:rotate(360deg)
+        }
+    }
+
+    @keyframes spin {
+        0% {
+            transform:rotate(0deg);
+        }
+        100% {
+            transform:rotate(360deg)
+        }
+    }
+
+}

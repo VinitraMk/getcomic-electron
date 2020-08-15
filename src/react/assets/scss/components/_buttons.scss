@@ -1,0 +1,13 @@
+#{$gc} {
+    &-btn {
+        padding:pxToRem(15) pxToRem(24);
+        border-radius:pxToRem(15);
+
+        &-primary {
+            background-color: $color-primary;
+            color:$white;
+            border-color:$color-primary;
+            border-style:solid;
+        }
+    }
+}
