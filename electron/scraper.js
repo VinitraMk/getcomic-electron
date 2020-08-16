@@ -1,4 +1,8 @@
 var webdriver = require("selenium-webdriver");
+var chrome = require("selenium-webdriver/chrome");
+var driverPath = require("chromedriver").path;
+var fs = require("fs");
+
 const { Options } = require("selenium-webdriver/chrome");
 const { elementLocated } = require("selenium-webdriver/lib/until");
 
@@ -6,37 +10,51 @@ exports.onSubmit = (url,seriesName) => onSubmit(url,seriesName);
 
 async function getSeriesSourceCode(url,seriesName) {
     console.log('fetching code',url);
+    let options = new Options();
+    //options.addArguments("--headless");
+    options.addArguments("--no-sandbox");
+    options.addArguments("--ignore-certificate-errors");
+    options.addArguments("--user-agent=foo");
+
+    
     try {
+        var service = await new chrome.ServiceBuilder(driverPath).build();
+        chrome.setDefaultService(service);
+
         driver = await new webdriver.Builder()
-        .usingServer("http://localhost:9515")
-        .withCapabilities({
-            binary:"/dist/ElectronReactBoilerPlate Setup 0.1.0.exe",
-        })
         .forBrowser("chrome")
-        //.setChromeOptions(new Options().addArguments("--headless"))
+        .withCapabilities(webdriver.Capabilities.chrome())
+        .setChromeOptions(options)
         .build();
+        
         await driver.get(url);
-        console.log('fetched source code');
+        console.log('driver build complete');
         let pageSrc = "";
+        //let el = driver.findElement(webdriver.By.id("container"));
+
+        /* works for normal chrome */
         
         await driver.wait(webdriver.until.elementLocated(webdriver.By.id("container")),60000).then(src=>{
-            console.log(src);
+            console.log('element found');
             try {
                 console.log("please wait fetching page source");
                 driver.getPageSource().then(res=>{
-                    //console.log('found page',res);
+                    console.log('fetching source complete');
                     pageSrc = res;
+                    fs.writeFile("sourcetext.txt",res,(err)=>{
+                        if(err) throw err;
+                    })
                     driver.quit();
-                    getListOfIssues();
+                    getListOfIssues(pageSrc);
                 })
                 .catch(err=>{
                     console.log(err);
                     driver.quit();
                 });
-                driver.quit();
+                //driver.quit();
             }
-            catch {
-                console.log('error');
+            catch(err) {
+                console.log('error:\n',err);
                 driver.quit();
             }
         })
