@@ -2,7 +2,7 @@ import React from "react";
 import Loader from "../../components/loader/Loader";
 import {isUrlValid} from "../../utilities/UrlValidators";
 
-const scraper = window.scraper;
+var scraper = window.scraper;
 
 export default class Home extends React.Component {
     constructor(props) {
@@ -15,6 +15,7 @@ export default class Home extends React.Component {
         }
         this.searchForComics = this.searchForComics.bind(this);
         this.onUrlChange = this.onUrlChange.bind(this);
+        scraper = window.scraper;
     }
 
 
@@ -30,11 +31,14 @@ export default class Home extends React.Component {
         if(res.isValid) {
             console.log(res);
             console.log(window.scraper,scraper);
-            scraper.onSubmit(this.state.url,res.comicName);
-            //getSourceCode(res.modifiedUrl);
-            //this.setState({
-                //showLoader:false
-            //})
+            scraper.onSubmit(this.state.url,res.comicName).then(result=>{
+                console.log(result);
+                if(result.comicName == res.comicName) {
+                    this.setState({
+                        showLoader:false
+                    });
+                }
+            });
         }
         else {
             this.setState({

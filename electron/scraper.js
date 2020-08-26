@@ -2,11 +2,17 @@ var webdriver = require("selenium-webdriver");
 var chrome = require("selenium-webdriver/chrome");
 var driverPath = require("chromedriver").path;
 var fs = require("fs");
+var parser = require("cheerio");
+var utils = require("util");
 
 const { Options } = require("selenium-webdriver/chrome");
 const { elementLocated, titleMatches } = require("selenium-webdriver/lib/until");
 
-exports.onSubmit = (url,seriesName) => onSubmit(url,seriesName);
+exports.onSubmit = (url,seriesName) => { 
+    return onSubmit(url,seriesName).then(res=>{
+        return res;
+    });
+};
 
 async function getSeriesSourceCode(url,seriesName) {
     console.log('fetching code',url);
@@ -30,6 +36,7 @@ async function getSeriesSourceCode(url,seriesName) {
         await driver.get(url);
         console.log('driver build complete');
         let pageSrc = "";
+        let issueResults = {};
         //let titlePattern = /[A-Z]+[a-z]*[-)|]*[0-9]*Read [A-Z]*[a-z]* comic online in high quality/
         //let el = driver.findElement(webdriver.By.id("container"));
 
@@ -37,11 +44,11 @@ async function getSeriesSourceCode(url,seriesName) {
             console.log('element found');
             try {
                 driver.getPageSource().then(res=>{
-                    fs.writeFile("source.txt",res,(err)=>{
+                    fs.writeFileSync("source.txt",res,(err)=>{
                         if(err) throw err;
                     });
+                    console.log("quiting driver...");
                     driver.quit();
-                    //getListOfIssues();
                 });
             }
             catch(err) {
@@ -59,38 +66,6 @@ async function getSeriesSourceCode(url,seriesName) {
             console.log(err);
             driver.quit();
         })
-
-
-        /* works for normal chrome */
-        
-        //await driver.wait(webdriver.until.elementLocated(webdriver.By.id("container")),60000).then(src=>{
-            //console.log('element found');
-            //try {
-                //console.log("please wait fetching page source");
-                //driver.getPageSource().then(res=>{
-                    //console.log('fetching source complete');
-                    //pageSrc = res;
-                    //fs.writeFile("sourcetext.txt",res,(err)=>{
-                        //if(err) throw err;
-                    //})
-                    //driver.quit();
-                    //getListOfIssues(pageSrc);
-                //})
-                //.catch(err=>{
-                    //console.log(err);
-                    //driver.quit();
-                //});
-                ////driver.quit();
-            //}
-            //catch(err) {
-                //console.log('error:\n',err);
-                //driver.quit();
-            //}
-        //})
-        //.catch(error=>{
-            //console.log(error);
-            //driver.quit();
-        //});
     }
     catch{
         console.log('error');
@@ -98,16 +73,43 @@ async function getSeriesSourceCode(url,seriesName) {
     }
 }
 
-function getListOfIssues() {
-    fs.unlinkSync("source.txt");
+function getListOfIssues(seriesName) {
+    if(fs.existsSync("source.txt")) {
+        console.log("source file found");
+        const $ = parser.load(fs.readFileSync("source.txt"));
+        let issueListTags = $('ul.list').children().toArray();
+        let issueLinks = [];
+        let issueTitles = [];
+        issueListTags.forEach(item=>{
+            issueLinks.push(item.children[0].attribs["href"]);
+        });
+        issueLinks.forEach(item=>{
+            let startIndex = item.lastIndexOf("/")+1;
+            let endIndex = item.indexOf("?");
+            let issueTitle = item.substring(startIndex,endIndex);
+            issueTitles.push(issueTitle);
+        })
+        let result = {
+            comicName:seriesName,
+            issueTitle:issueTitles,
+            issueLinks:issueLinks
+        }
+        fs.unlinkSync("source.txt");
+        return result;
+    }
+    else {
+        console.log("file not found :-(");
+        return null;
+    }
 }
 
-function onSubmit(url,seriesName) {
+async function onSubmit(url,seriesName) {
     console.log('yay communicating');
-    getSeriesSourceCode(url,seriesName).then(()=>{
-        getListOfIssues();
+    return getSeriesSourceCode(url,seriesName).then(()=>{
+        return getListOfIssues(seriesName);
     })
     .catch((err)=>{
         console.log(err);
+        return err;
     }); 
 }
