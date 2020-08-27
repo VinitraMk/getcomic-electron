@@ -1,0 +1,13 @@
+#{$gc} {
+    &-root {
+        min-height: 100vh;
+        background-image: url("../../images/Page_Background.png");
+
+        &-title {
+            font-size:pxToRem(131);
+            line-height: pxToRem(183);
+            color:$color-primary;
+            font-weight: normal;
+        }
+    }
+}

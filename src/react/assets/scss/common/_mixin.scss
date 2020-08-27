@@ -1,0 +1,90 @@
+/* _mixins.scss */
+
+@mixin size($width, $height: $width) {
+  width: $width;
+  height: $height;
+}
+
+@mixin border-all($width, $style, $color) {
+  border: $width $style $color;
+}
+
+@mixin border($direction, $width, $style, $color) {
+  border-#{$direction}: $width $style $color;
+}
+
+@mixin bg-color($color) {
+  background-color: $color;
+}
+
+@mixin space($type: margin, $direction: all, $amount: null) {
+  @if $type == padding {
+    @if $direction == all {
+      padding: $amount;
+    } @else if $direction == top {
+      padding-top: $amount;
+    } @else if $direction == left {
+      padding-left: $amount;
+    } @else if $direction == right {
+      padding-right: $amount;
+    } @else if $direction == y {
+      padding-top: $amount;
+      padding-bottom: $amount;
+    } @else if $direction == x {
+      padding-left: $amount;
+      padding-right: $amount;
+    } @else {
+      padding-bottom: $amount;
+    }
+  } @else {
+    @if $direction == all {
+      margin: $amount;
+    } @else if $direction == top {
+      margin-top: $amount;
+    } @else if $direction == left {
+      margin-left: $amount;
+    } @else if $direction == right {
+      margin-right: $amount;
+    } @else if $direction == leftright {
+      margin-left: $amount;
+      margin-right: $amount;
+    } @else {
+      margin-bottom: $amount;
+    }
+  }
+}
+
+@mixin border-radius($radius) {
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+  border-radius: $radius;
+  background-clip: padding-box;
+}
+
+@mixin square($val) {
+  display: inline-block;
+  width: $val;
+  height: $val;
+}
+
+@mixin circle($val) {
+  display: inline-block;
+  width: $val;
+  height: $val;
+  border-radius: 100%;
+}
+
+@mixin rotate($val) {
+  -webkit-transform: rotate($val);
+  -o-transform: rotate($val);
+  -moz-transform: rotate($val);
+  -ms-transform: rotate($val);
+  transform: rotate($val);
+}
+
+@mixin container-all-center() {
+  display: flex;
+  flex-flow:column;
+  justify-content: center;
+  align-items: center;
+}
