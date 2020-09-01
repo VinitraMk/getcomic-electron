@@ -51,40 +51,16 @@ export class Results extends React.Component {
         let selectedIssue = this.state.issueTableData.filter(item => item.rowKey === rowItem.rowKey)[0];
 
         selectedIssue.getTemplate = (rowItem) => {
-            return <CircularProgressBar value={0} onClick={()=>this.cancelDownload(rowItem)}/>
+            return <CircularProgressBar value={0} onClick={()=>{this.cancelDownload(rowItem)}}/>
         }
 
         this.updateRowTemplate(selectedIssue);
-
-        this.updateProgress(rowItem);
     }
 
-    updateProgress(rowItem) {
-        console.log('in update progress');
-        setTimeout(() => {
-            console.log('inside interval');
-            let val = rowItem.value;
-            if(val===100) {
-                let selectedIssue = this.state.issueTableData.filter(item => item.rowKey === rowItem.rowKey)[0];
-                selectedIssue.getTemplate = (rowItem) => {
-                    return <span>Download Complete!</span> 
-                }
-            }
-            else {
-                val += 25;
-                let selectedIssue = this.state.issueTableData.filter(item => item.rowKey === rowItem.rowKey)[0];
-                selectedIssue.getTemplate = (rowItem) => {
-                    return <CircularProgressBar value={val} onClick={()=>this.cancelDownload(rowItem)}/>
-                }
-
-                this.updateRowTemplate(selectedIssue);
-                
-            }
-        },3000,this.updateProgress,rowItem);
-    }
 
     cancelDownload(rowItem) {
         //let issueList = this.state.issueTableData;
+        //console.log('clicked cancel');
         let selectedIssue = this.state.issueTableData.filter(item => item.rowKey === rowItem.rowKey)[0];
 
         selectedIssue.getTemplate = (rowItem) => {

@@ -15,10 +15,12 @@ export default class Home extends React.Component {
             urlResponse:"",
             showResults:false,
             issueList:[],
+            targetDirectory:""
         }
         this.searchForComics = this.searchForComics.bind(this);
         this.onUrlChange = this.onUrlChange.bind(this);
         this.goToHome = this.goToHome.bind(this);
+        this.onTargetChange = this.onTargetChange.bind(this);
         scraper = window.scraper;
     }
 
@@ -76,6 +78,10 @@ export default class Home extends React.Component {
         })
     }
 
+    onTargetChange() {
+
+    }
+
     render() {
         return(
             <>
@@ -84,7 +90,7 @@ export default class Home extends React.Component {
                 </span>}
                 <div className="gc-container-ac">
                     {!this.state.showResults && <h1 className="gc-root-title">Getcomic</h1>}
-                    <form onSubmit={this.searchForComics} className="m-b-4">
+                    {!this.state.showResults && <form onSubmit={this.searchForComics} className="m-b-4">
                         <div className={`gc-input-group ${this.state.isUrlInvalid ? "error-input" : ""}`}>
                             <input type="text" className="gc-input-control gc-input-control--search" 
                             placeholder="Enter series or comic issue url here..."
@@ -93,7 +99,15 @@ export default class Home extends React.Component {
                             <button type="submit" className="gc-btn gc-btn-primary">Search</button>
                         </div>
                         {this.state.isUrlInvalid && <span className="error-message">The url is invalid!</span>}
-                    </form>
+                    </form>}
+                    {this.state.showResults && 
+                        <label className={`gc-input-file m-b-4 m-t-6 ${this.state.isUrlInvalid ? "error-input" : ""}`}>
+                            <input type="file" 
+                            onChange={this.onTargetChange}
+                            aria-label="Choose target directory"/>
+                            <span className="gc-input-file__action"></span>
+                        </label>
+                    }
                     {this.state.showLoader && <Loader message="Fetching Results"/>}
                     {this.state.showResults && <Results issueList={this.state.issueList}/>}
                 </div>

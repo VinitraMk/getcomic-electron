@@ -52,8 +52,10 @@ input[type="password"] {
   }
 }
 
-input[type="file"]::-webkit-file-upload-button {
-  visibility: hidden;
+
+input[type="file"],input[type="file"]::-webkit-file-upload-button {
+  height: 0;
+  width: 0;
 }
 
 /* Firefox */

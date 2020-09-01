@@ -16,6 +16,10 @@
             border: none;
             color: #C91414;
             cursor: pointer;
+
+            &:hover {
+                text-decoration:underline;
+            }
         }
     }
 }
