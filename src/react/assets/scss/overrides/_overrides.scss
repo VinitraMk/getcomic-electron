@@ -1,0 +1,19 @@
+//.CircularProgressbar {
+    //height:pxToRem(40);
+    //width:pxToRem(40);
+//}
+
+.gc-progressbar {
+    
+    &__icn {
+        display: block;
+        height: 100%;
+        width: 100%;
+        margin-top: 70%;
+        text-align: center;
+    }
+}
+
+.CircularProgressbar {
+    height:pxToRem(40);
+}

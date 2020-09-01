@@ -1,7 +1,19 @@
-const { app, BrowserWindow,ipcMain } = require('electron');
+const { app, BrowserWindow,ipcMain,remote, Menu,MenuItem } = require('electron');
 const {channels} = require("../src/shared/constants");
 const path = require('path');
 const url = require('url');
+
+let rightClckPos = null;
+const menu = new Menu();
+const menuItem = new MenuItem({
+    label:'Inspect Element Ctrl+I',
+    click:()=>{
+      remote.getCurrentWebContents().inspectElement(rightClckPos.x,rightClckPos.y);
+    }
+});
+
+menu.append(menuItem);
+
 let mainWindow;
 function createWindow () {
   const startUrl = process.env.ELECTRON_START_URL || url.format({
@@ -14,6 +26,14 @@ function createWindow () {
   mainWindow.on('closed', function () {
     mainWindow = null;
   });
+
+
+
+  //mainWindow.addListener('contextmenu',(e)=>{
+    //e.preventDefault();
+    //rightClckPos = {x:e.x,y:e.y};
+    //menu.popup(remote.getCurrentWindow());
+  //},false);
 }
 app.on('ready', createWindow);
 app.on('window-all-closed', function () {
@@ -33,3 +53,4 @@ ipcMain.on(channels.APP_INFO, (event) => {
     appVersion: app.getVersion(),
   });
 });
+

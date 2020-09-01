@@ -9,5 +9,13 @@
             border-color:$color-primary;
             border-style:solid;
         }
+
+        &-link {
+            padding: 0;
+            background: inherit;
+            border: none;
+            color: #C91414;
+            cursor: pointer;
+        }
     }
 }
