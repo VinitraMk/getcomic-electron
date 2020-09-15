@@ -1,8 +1,7 @@
 import React from 'react';
 import { Grid } from '../../components/grid/Grid';
-import { titleIs } from 'selenium-webdriver/lib/until';
 import { CircularProgressBar } from '../../components/circular-progressbar/CircularProgressBar';
-import { CircularProgressbarWithChildren } from 'react-circular-progressbar';
+import Dialog from "../../components/dialog/Dialog";
 
 export class Results extends React.Component {
 
@@ -34,7 +33,8 @@ export class Results extends React.Component {
                         //}
                     }
                 }
-            ]
+            ],
+            showErrorDialog:false
         }
 
         this.prepareTableData = this.prepareTableData.bind(this);
@@ -54,7 +54,11 @@ export class Results extends React.Component {
             return <CircularProgressBar value={0} onClick={()=>{this.cancelDownload(rowItem)}}/>
         }
 
-        this.updateRowTemplate(selectedIssue);
+        this.updateRowTemplate(selectedIssue)
+
+        if(this.props.targetDirectory==="") {
+
+        }
     }
 
 
@@ -107,6 +111,7 @@ export class Results extends React.Component {
         return(
             <>
                 <Grid columns={this.state.tableCols} data={this.state.issueTableData}></Grid>
+                {this.state.showErrorDialog && <Dialog title="" message=""/>}
             </>
         )
     }

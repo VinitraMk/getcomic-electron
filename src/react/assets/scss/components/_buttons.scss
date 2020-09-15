@@ -21,5 +21,12 @@
                 text-decoration:underline;
             }
         }
+
+        &-outline {
+            font-size:pxToRem(12);
+            background:$color-secondary;
+            color:$color-primary;
+            border-radius:pxToRem(4);
+        }
     }
 }

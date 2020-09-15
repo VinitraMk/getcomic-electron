@@ -2,6 +2,7 @@ import React from "react";
 import Loader from "../../components/loader/Loader";
 import {isUrlValid} from "../../utilities/UrlValidators";
 import {Results} from "../results/Results";
+import { titleMatches } from "selenium-webdriver/lib/until";
 
 var scraper = window.scraper;
 
@@ -78,8 +79,16 @@ export default class Home extends React.Component {
         })
     }
 
-    onTargetChange() {
-
+    onTargetChange(event) {
+        let fileName = event.target.files[0].name;
+        let filePath = event.target.files[0].path;
+        let path = filePath.substring(0,filePath.indexOf(fileName));
+        this.setState({
+            targetDirectory:path
+        });
+        let el = document.querySelector("#targetDirInp");
+        //document.styleSheets[0].addRule('#targetDireInp:before','content:"'+path+'"');
+        document.getElementById("targetDirInp").setAttribute("data-filepath",path);
     }
 
     render() {
@@ -102,14 +111,16 @@ export default class Home extends React.Component {
                     </form>}
                     {this.state.showResults && 
                         <label className={`gc-input-file m-b-4 m-t-6 ${this.state.isUrlInvalid ? "error-input" : ""}`}>
-                            <input type="file" 
+                            <input type="file"
                             onChange={this.onTargetChange}
-                            aria-label="Choose target directory"/>
-                            <span className="gc-input-file__action"></span>
+                            aria-label="Choose target directory..."
+                            webkitdirectory="true"
+                            />
+                            <span className="gc-input-file__action" id="targetDirInp" data-filepath="Choose directory..."></span>
                         </label>
                     }
                     {this.state.showLoader && <Loader message="Fetching Results"/>}
-                    {this.state.showResults && <Results issueList={this.state.issueList}/>}
+                    {this.state.showResults && <Results issueList={this.state.issueList} targetDirectory={this.state.targetDirectory}/>}
                 </div>
             </>
             
