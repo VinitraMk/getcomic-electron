@@ -18,7 +18,7 @@ exports.onSubmit = (url,seriesName) => {
 };
 
 async function getSeriesSourceCode(url,seriesName) {
-    console.log('fetching code',url);
+    //console.log('fetching code',url);
     let options = new Options();
     options.addArguments("--headless");
     options.addArguments("--no-sandbox");
@@ -29,18 +29,19 @@ async function getSeriesSourceCode(url,seriesName) {
     try {
         var service = await new chrome.ServiceBuilder(driverPath).build();
         chrome.setDefaultService(service);
+        console.log('setting build for driver',driverPath);
 
-        driver = await new webdriver.Builder()
+        let driver = await new webdriver.Builder()
         .forBrowser("chrome")
         .withCapabilities(webdriver.Capabilities.chrome())
         .setChromeOptions(options)
         .build();
-        
+
         await driver.get(url);
         console.log('driver build complete');
 
         await driver.wait(webdriver.until.titleContains("comic online")).then(src=>{
-            console.log('element found');
+            //console.log('element found');
             return (async() =>{
                 await driver.getPageSource().then(res=>{
                     return (async()=>{
@@ -70,8 +71,8 @@ async function getSeriesSourceCode(url,seriesName) {
             driver.quit();
         })
     }
-    catch{
-        console.log('error');
+    catch(err) {
+        console.log('error',err);
         driver.quit();
     }
 }

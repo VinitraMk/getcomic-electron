@@ -2,6 +2,7 @@
     &-btn {
         padding:pxToRem(15) pxToRem(24);
         border-radius:pxToRem(15);
+        cursor: pointer;
 
         &-primary {
             background-color: $color-primary;
@@ -26,7 +27,12 @@
             font-size:pxToRem(12);
             background:$color-secondary;
             color:$color-primary;
+            border:none;
             border-radius:pxToRem(4);
+        }
+
+        &--sm {
+            padding:10px;
         }
     }
 }
