@@ -6,7 +6,7 @@ import {DEFAULT_URL} from "../../constants/AppConstants";
 import { titleMatches } from "selenium-webdriver/lib/until";
 import { EMPTY_TD_MSG, EMPTY_TD_TITLE } from "../../constants/ErrorMessages";
 import Dialog from "../../components/dialog/Dialog";
-var scraper = window.scraper;
+var mainProcess = window.mainProcess;
 
 export default class Home extends React.Component {
     constructor(props) {
@@ -29,7 +29,7 @@ export default class Home extends React.Component {
         this.goToHome = this.goToHome.bind(this);
         this.onTargetChange = this.onTargetChange.bind(this);
         this.targetDirInp = React.createRef();
-        scraper = window.scraper;
+        mainProcess = window.mainProcess;
     }
 
 
@@ -44,7 +44,7 @@ export default class Home extends React.Component {
 
         if(res.isValid) {
             //console.log(res);
-            scraper.onSubmit(this.state.url,res.comicName).then(result=>{
+            mainProcess.onSubmit(this.state.url,res.comicName).then(result=>{
                 //console.log(result);
                 if(result!==null && result.comicName == res.comicName) {
                     this.setState({

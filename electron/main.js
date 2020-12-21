@@ -26,14 +26,8 @@ function createWindow () {
   mainWindow.on('closed', function () {
     mainWindow = null;
   });
-
-
-
-  //mainWindow.addListener('contextmenu',(e)=>{
-    //e.preventDefault();
-    //rightClckPos = {x:e.x,y:e.y};
-    //menu.popup(remote.getCurrentWindow());
-  //},false);
+  mainWindow.setMinimizable(false);
+  mainWindow.maximize();
 }
 app.on('ready', createWindow);
 app.on('window-all-closed', function () {

@@ -9,7 +9,7 @@ const { ipcRenderer,remote } = require('electron');
 //.forBrowser("electron")
 //.build();
 
-const scraper = remote.require("./scraper");
-
+//const scraper = remote.require("./scraper");
+const mainProcess = remote.require("./main-process.js");
 window.ipcRenderer = ipcRenderer;
-window.scraper = scraper;
+window.mainProcess = mainProcess;

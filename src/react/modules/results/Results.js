@@ -3,8 +3,9 @@ import { Grid } from '../../components/grid/Grid';
 import { CircularProgressBar } from '../../components/circular-progressbar/CircularProgressBar';
 import Dialog from "../../components/dialog/Dialog";
 import { UNSPECIFIED_TARGET_DIRECTORY_MSG, UNSPECIFIED_TARGET_DIRECTORY_TITLE } from '../../constants/ErrorMessages';
+import { DOWNLOAD_TYPE } from '../../../shared/constants';
 
-var downloader = window.downloader;
+var mainProcess = window.mainProcess;
 
 export class Results extends React.Component {
 
@@ -55,13 +56,23 @@ export class Results extends React.Component {
 
     downloadIssue(rowItem) {
         //console.log('download clicked',rowItem);
-        //let issueList = this.state.issueTableData;
-        let selectedIssue = this.state.issueTableData.filter(item => item.rowKey === rowItem.rowKey)[0];
-        downloader.onDownload("issue",this.props.targetDirectory,this.props.seriesName,selectedIssue.issueLink);
-        selectedIssue.getTemplate = (rowItem) => {
-            return <CircularProgressBar value={0} onClick={()=>{this.cancelDownload(rowItem)}}/>
-        };
-        this.updateRowTemplate(selectedIssue);
+        //let issueList = this.state.issueTableData;a
+        if(this.props.targetDirectory!=="") {
+            let selectedIssue = this.state.issueTableData.filter(item => item.rowKey === rowItem.rowKey)[0];
+            mainProcess.onDownload(DOWNLOAD_TYPE.ISSUE,this.props.targetDirectory,this.props.seriesName,[selectedIssue.issueLink]);
+            selectedIssue.getTemplate = (rowItem) => {
+                return <CircularProgressBar value={0} onClick={()=>{this.cancelDownload(rowItem)}}/>
+            };
+            this.updateRowTemplate(selectedIssue);
+        }
+        else {
+            this.setState({
+                errorMessage:UNSPECIFIED_TARGET_DIRECTORY_MSG,
+                errorDialogTitle:UNSPECIFIED_TARGET_DIRECTORY_TITLE,
+                showErrorDialog:true
+            })
+        }
+        
     }
 
 

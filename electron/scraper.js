@@ -8,14 +8,14 @@ var utils = require("util");
 const { Options } = require("selenium-webdriver/chrome");
 const { elementLocated, titleMatches } = require("selenium-webdriver/lib/until");
 
-exports.onSubmit = (url,seriesName) => { 
-    return onSubmit(url,seriesName).then(res=>{
-        console.log('receiving results',res);
-        if(res!==undefined) {
-            return res;
-        }
-    });
-};
+//exports.onSubmit = (url,seriesName) => { 
+    //return onSubmit(url,seriesName).then(res=>{
+        //console.log('receiving results',res);
+        //if(res!==undefined) {
+            //return res;
+        //}
+    //});
+//};
 
 async function getSeriesSourceCode(url,seriesName) {
     //console.log('fetching code',url);
@@ -29,7 +29,6 @@ async function getSeriesSourceCode(url,seriesName) {
     try {
         var service = await new chrome.ServiceBuilder(driverPath).build();
         chrome.setDefaultService(service);
-        console.log('setting build for driver',driverPath);
 
         let driver = await new webdriver.Builder()
         .forBrowser("chrome")
@@ -129,6 +128,16 @@ function getListOfIssues(seriesName) {
     //return result;
 }
 
+function getListOfImageLinks(url) {
+    let options = new Options();
+    options.addArguments("--headless");
+    options.addArguments("--no-sandbox");
+    options.addArguments("--ignore-certificate-errors");
+    options.addArguments("--user-agent=foo");
+
+    
+}
+
 async function onSubmit(url,seriesName) {
     console.log('yay communicating');
     return getSeriesSourceCode(url,seriesName).then(()=>{
@@ -139,4 +148,9 @@ async function onSubmit(url,seriesName) {
         console.log(err);
         return err;
     }); 
+}
+
+module.exports = {
+    onSubmit,
+    getListOfImageLinks,
 }
