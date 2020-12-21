@@ -4,7 +4,8 @@ import {isUrlValid} from "../../utilities/UrlValidators";
 import {Results} from "../results/Results";
 import {DEFAULT_URL} from "../../constants/AppConstants";
 import { titleMatches } from "selenium-webdriver/lib/until";
-
+import { EMPTY_TD_MSG, EMPTY_TD_TITLE } from "../../constants/ErrorMessages";
+import Dialog from "../../components/dialog/Dialog";
 var scraper = window.scraper;
 
 export default class Home extends React.Component {
@@ -17,7 +18,11 @@ export default class Home extends React.Component {
             urlResponse:"",
             showResults:false,
             issueList:[],
-            targetDirectory:""
+            targetDirectory:"",
+            showErrorDialog:false,
+            errorDialogTitle:"",
+            errorMessage:"",
+            seriesName:""
         }
         this.searchForComics = this.searchForComics.bind(this);
         this.onUrlChange = this.onUrlChange.bind(this);
@@ -39,14 +44,14 @@ export default class Home extends React.Component {
 
         if(res.isValid) {
             //console.log(res);
-            //console.log(window.scraper,scraper);
             scraper.onSubmit(this.state.url,res.comicName).then(result=>{
                 //console.log(result);
                 if(result!==null && result.comicName == res.comicName) {
                     this.setState({
                         showLoader:false,
                         showResults:true,
-                        issueList:result.issueList
+                        issueList:result.issueList,
+                        seriesName:res.comicName
                     });
                 }
             });
@@ -82,17 +87,31 @@ export default class Home extends React.Component {
     }
 
     onTargetChange(event) {
-        console.log('target change clicked',event.target.files);
-        let fileName = event.target.files[0].name;
-        let filePath = event.target.files[0].path;
-        let path = filePath.substring(0,filePath.indexOf(fileName));
+        if(event.target.files.length>0) {
+            let fileName = event.target.files[0].name;
+            let filePath = event.target.files[0].path;
+            let path = filePath.substring(0,filePath.indexOf(fileName));
+            this.setState({
+                targetDirectory:path
+            });
+            //document.styleSheets[0].addRule('#targetDirInp:before',`content:${path}`);
+            document.getElementById("targetDirInp").setAttribute("data-filepath",path);
+        }
+        else {
+            this.setState({
+                showErrorDialog:true,
+                errorDialogTitle:EMPTY_TD_TITLE,
+                errorMessage:EMPTY_TD_MSG
+            });
+        }
+    }
+
+    closeErrorDialog() {
         this.setState({
-            targetDirectory:path
+            showErrorDialog:false,
+            errorDialogTitle:"",
+            errorMessage:""
         });
-        //let el = document.querySelector("#targetDirInp");
-        document.styleSheets[0].addRule('#targetDireInp:before','content:"'+path+'"');
-        console.log(path);
-        document.getElementById("targetDirInp").setAttribute("data-filepath",path);
     }
 
     render() {
@@ -113,8 +132,18 @@ export default class Home extends React.Component {
                         </div>
                         {this.state.isUrlInvalid && <span className="error-message">The url is invalid!</span>}
                     </form>}
+                    {this.state.showResults && 
+                        <label className="gc-input-group gc-input-file">
+                            <input type="file" 
+                            onChange={this.onTargetChange}
+                            webkitdirectory="true"
+                            />
+                            <span className="gc-input-file__action" data-filepath="Choose directory" id="targetDirInp"></span>
+                        </label>
+                    }
                     {this.state.showLoader && <Loader message="Fetching Results"/>}
-                    {this.state.showResults && <Results issueList={this.state.issueList} targetDirectory={this.state.targetDirectory}/>}
+                    {this.state.showResults && <Results seriesName={this.state.seriesName} issueList={this.state.issueList} targetDirectory={this.state.targetDirectory}/>}
+                    {this.state.showErrorDialog && <Dialog title={this.state.errorDialogTitle} message={this.state.errorMessage} onDismiss={this.closeErrorDialog}/>}
                 </div>
             </>
             

@@ -2,9 +2,8 @@
     &-container {
         &-ac {
             @include container-all-center;
-            padding:pxToRem(40) 0;
+            padding:pxToRem(80) 0;
             margin:0 pxToRem(40);
         }
-        
     }
 }
