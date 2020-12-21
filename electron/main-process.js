@@ -3,7 +3,7 @@ const downloader = require("./downloader");
 
 exports.onSubmit = (url,seriesName) => { 
     return scraper.onSubmit(url,seriesName).then(res=>{
-        console.log('receiving results',res);
+        console.log('receiving results...');
         if(res!==undefined) {
             return res;
         }

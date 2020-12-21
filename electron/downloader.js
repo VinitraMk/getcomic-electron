@@ -13,7 +13,8 @@ async function onDownloadSubmit(downloadType,targetDirectory,comicName,comicIssu
 
     if(downloadType===DOWNLOAD_TYPE.ISSUE) {
         downloadIssue(`${DOWNLOAD_ENDPOINT}${comicIssueLinks[0]}${DOWNLOAD_ARGS}`,TD_FULLPATH).then(()=>{
-            extractIssuePages();
+            let imgList = extractIssuePages();
+            console.log('received img links of issue');
         });
     }
     else {
@@ -83,17 +84,33 @@ async function downloadIssue(downloadLink,destination) {
 }
 
 function extractIssuePages() {
+    let imgList = [];
     if(fs.existsSync('source.txt')) {
         console.log('got src code');
         const $ = parser.load(fs.readFileSync("./source.txt"));
-        let issuePages = $('lstImages');
-        console.log(issuePages).children().toArray();
+        imgList = $('div#divImage img').toArray().map(img=>img.attribs.src);
+        removeSrcFile();
     }
     else {
         console.log('src file does not exist');
     }
+    return imgList;
 }
 
+async function removeSrcFile() {
+    try {
+        fs.unlink("./source.txt",(err)=>{
+            if(err) throw err;
+        });
+        //console.log('removed file');
+    }
+    catch(err) {
+        if(err) {
+            console.log(err);
+            return;
+        }
+    }
+}
 module.exports = {
     onDownloadSubmit
 }

@@ -78,7 +78,7 @@ async function getSeriesSourceCode(url,seriesName) {
 
 function getListOfIssues(seriesName) {
     if(fs.existsSync("./source.txt")) {
-        console.log("source file found");
+        //console.log("source file found");
         const $ = parser.load(fs.readFileSync("./source.txt"));
         let issueListTags = $('ul.list').children().toArray();
         let issueList = [];
@@ -109,7 +109,7 @@ function getListOfIssues(seriesName) {
                         //console.log('removed file');
                         //return result;
                     });
-                    console.log('removed file');
+                    //console.log('removed file');
                     return result;
                 }
                 catch(err) {
@@ -141,7 +141,6 @@ function getListOfImageLinks(url) {
 async function onSubmit(url,seriesName) {
     console.log('yay communicating');
     return getSeriesSourceCode(url,seriesName).then(()=>{
-        console.log('got series code res');
         return getListOfIssues(seriesName);
     })
     .catch((err)=>{
