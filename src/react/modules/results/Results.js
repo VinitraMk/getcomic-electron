@@ -59,7 +59,7 @@ export class Results extends React.Component {
         //let issueList = this.state.issueTableData;a
         if(this.props.targetDirectory!=="") {
             let selectedIssue = this.state.issueTableData.filter(item => item.rowKey === rowItem.rowKey)[0];
-            mainProcess.onDownload(DOWNLOAD_TYPE.ISSUE,this.props.targetDirectory,this.props.seriesName,[selectedIssue.issueLink]);
+            mainProcess.onDownload(DOWNLOAD_TYPE.ISSUE,this.props.targetDirectory,this.props.seriesName,[{issueLink:selectedIssue.issueLink,issueName:selectedIssue.issueTitle}]);
             selectedIssue.getTemplate = (rowItem) => {
                 return <CircularProgressBar value={0} onClick={()=>{this.cancelDownload(rowItem)}}/>
             };
