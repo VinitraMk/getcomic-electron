@@ -92,7 +92,8 @@ function getListOfIssues(seriesName) {
             let issueTitle = issueLink.substring(startIndex,endIndex);
             issueList.push({
                 issueTitle:issueTitle,
-                issueLink:issueLink
+                issueLink:issueLink,
+                isDownloaded:false
             });
         });
         

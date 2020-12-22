@@ -21,7 +21,7 @@ async function onDownloadSubmit(downloadType,targetDirectory,comicName,comicIssu
             let imgList = extractIssuePages();
             console.log('received img links of issue');
             //let TMP_IMG_PATH = prepareForDownload(TD_FULLPATH);
-            createPDF(imgList,comicIssueLinks[0].issueName,TD_FULLPATH,(resObj)=>{
+            createPDF(imgList,comicIssueLinks[0].issueName,comicName,TD_FULLPATH,(resObj)=>{
                 callback(resObj);
             });
         });
@@ -93,7 +93,7 @@ async function downloadIssue(downloadLink,destination) {
     }
 }
 
-function createPDF(imgLinks,issueName,destination,progressCallback) {
+function createPDF(imgLinks,issueName,comicName,destination,progressCallback) {
     console.log(`creating pdf of issue ${issueName}`);
     let resObj = {
         success:false,
@@ -102,7 +102,8 @@ function createPDF(imgLinks,issueName,destination,progressCallback) {
     }
     let pdfDoc = new PDFDocument();
     pdfDoc.pipe(fs.createWriteStream(`${destination}/${issueName}.pdf`));
-    pdfDoc.text(issueName,{align:"center"});
+    pdfDoc.text(comicName,{align:"center"});
+    pdfDoc.text(issueName,{align:"center",valign:"center"});
     downloadImages(imgLinks,pdfDoc,(count)=>{
         //trackDownloadProgress(imgLinks.length,count);
         if(count===imgLinks.length) {

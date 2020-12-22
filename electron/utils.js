@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require("path");
 
 function createFile(filePath) {
     if(!fs.existsSync(filePath)) {
@@ -24,7 +25,18 @@ function removeFile(filePath) {
     }
 }
 
+function searchForFiles(files,destination) {
+    files.map((file)=>{
+        if(fs.existsSync(path.join(destination,`${file.issueTitle}.pdf`))) {
+            file.isDownloaded = true;
+        }
+        return file;
+    });
+    return files;
+}
+
 module.exports = {
     createFile,
-    removeFile
+    removeFile,
+    searchForFiles
 }

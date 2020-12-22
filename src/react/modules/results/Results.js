@@ -4,7 +4,7 @@ import { CircularProgressBar } from '../../components/circular-progressbar/Circu
 import Dialog from "../../components/dialog/Dialog";
 import { UNSPECIFIED_TARGET_DIRECTORY_MSG, UNSPECIFIED_TARGET_DIRECTORY_TITLE } from '../../constants/ErrorMessages';
 import { DOWNLOAD_STATUS, DOWNLOAD_TYPE } from '../../../shared/constants';
-
+import * as arrUtils from "../../utilities/ArrayUtils";
 var mainProcess = window.mainProcess;
 
 export class Results extends React.Component {
@@ -45,6 +45,12 @@ export class Results extends React.Component {
 
     componentDidMount() {
         this.prepareTableData();
+    }
+
+    componentDidUpdate(prevProps) {
+        if(!arrUtils.compareObjects(prevProps.issueList,this.props.issueList)) {
+            this.prepareTableData();
+        }
     }
 
 
@@ -123,7 +129,12 @@ export class Results extends React.Component {
                     rowKey:"row-"+item.issueTitle,
                     relativeDestination:`${this.props.seriesName}/${item.issueTitle}.pdf`,
                     getTemplate:(row) => {
-                        return <button className="gc-btn-link" onClick={()=>{this.downloadIssue(row)}}>Download</button>
+                        if(item.isDownloaded) {
+                            return <button className="gc-btn-link" onClick={()=>{this.viewPdf(row)}}>View</button>
+                        }
+                        else {
+                            return <button className="gc-btn-link" onClick={()=>{this.downloadIssue(row)}}>Download</button>
+                        }
                     }
                 })
             });

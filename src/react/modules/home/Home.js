@@ -2,8 +2,7 @@ import React from "react";
 import Loader from "../../components/loader/Loader";
 import {isUrlValid} from "../../utilities/UrlValidators";
 import {Results} from "../results/Results";
-import {DEFAULT_TD, DEFAULT_URL, NO_TD_MSG} from "../../constants/AppConstants";
-import { titleMatches } from "selenium-webdriver/lib/until";
+import {DEFAULT_URL, NO_TD_MSG} from "../../constants/AppConstants";
 import { EMPTY_TD_MSG, EMPTY_TD_TITLE } from "../../constants/ErrorMessages";
 import Dialog from "../../components/dialog/Dialog";
 var mainProcess = window.mainProcess;
@@ -29,9 +28,11 @@ export default class Home extends React.Component {
         this.goToHome = this.goToHome.bind(this);
         this.onTargetChange = this.onTargetChange.bind(this);
         this.closeErrorDialog = this.closeErrorDialog.bind(this);
+        this.checkForExistingDownloads = this.checkForExistingDownloads.bind(this);
         this.targetDirInp = React.createRef();
         mainProcess = window.mainProcess;
     }
+
 
 
     searchForComics(e) {
@@ -53,6 +54,8 @@ export default class Home extends React.Component {
                         showResults:true,
                         issueList:result.issueList,
                         seriesName:res.comicName
+                    },()=>{
+                        this.checkForExistingDownloads();
                     });
                 }
             });
@@ -93,8 +96,11 @@ export default class Home extends React.Component {
             let filePath = event.target.files[0].path;
             let path = filePath.substring(0,filePath.indexOf(fileName));
             this.setState({
-                targetDirectory:path
+                targetDirectory:path,
+            },()=>{
+                this.checkForExistingDownloads();
             });
+            
         }
         else {
             this.setState({
@@ -111,6 +117,14 @@ export default class Home extends React.Component {
             errorDialogTitle:"",
             errorMessage:""
         });
+    }
+
+    checkForExistingDownloads() {
+        this.setState((prevState)=> {
+            return {
+                issueList: mainProcess.searchFilesExist(prevState.issueList,`${this.state.targetDirectory}${prevState.seriesName}`)
+            }
+        })
     }
 
     render() {
