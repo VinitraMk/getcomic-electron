@@ -2,7 +2,7 @@ import React from "react";
 import Loader from "../../components/loader/Loader";
 import {isUrlValid} from "../../utilities/UrlValidators";
 import {Results} from "../results/Results";
-import {DEFAULT_TD, DEFAULT_URL} from "../../constants/AppConstants";
+import {DEFAULT_TD, DEFAULT_URL, NO_TD_MSG} from "../../constants/AppConstants";
 import { titleMatches } from "selenium-webdriver/lib/until";
 import { EMPTY_TD_MSG, EMPTY_TD_TITLE } from "../../constants/ErrorMessages";
 import Dialog from "../../components/dialog/Dialog";
@@ -18,7 +18,7 @@ export default class Home extends React.Component {
             urlResponse:"",
             showResults:false,
             issueList:[],
-            targetDirectory:DEFAULT_TD,
+            targetDirectory:"",
             showErrorDialog:false,
             errorDialogTitle:"",
             errorMessage:"",
@@ -28,6 +28,7 @@ export default class Home extends React.Component {
         this.onUrlChange = this.onUrlChange.bind(this);
         this.goToHome = this.goToHome.bind(this);
         this.onTargetChange = this.onTargetChange.bind(this);
+        this.closeErrorDialog = this.closeErrorDialog.bind(this);
         this.targetDirInp = React.createRef();
         mainProcess = window.mainProcess;
     }
@@ -94,8 +95,6 @@ export default class Home extends React.Component {
             this.setState({
                 targetDirectory:path
             });
-            //document.styleSheets[0].addRule('#targetDirInp:before',`content:${path}`);
-            //document.getElementById("targetDirInp").setAttribute("data-filepath",path);
         }
         else {
             this.setState({
@@ -138,7 +137,7 @@ export default class Home extends React.Component {
                             onChange={this.onTargetChange}
                             webkitdirectory="true"
                             />
-                            <span className="gc-input-file__action" data-filepath={`${this.state.targetDirectory ? this.state.targetDirectory : 'Choose directory'}`} id="targetDirInp"></span>
+                            <span className="gc-input-file__action" data-filepath={`${this.state.targetDirectory ? this.state.targetDirectory : NO_TD_MSG}`}></span>
                         </label>
                     }
                     {this.state.showLoader && <Loader message="Fetching Results"/>}

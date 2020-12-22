@@ -10,10 +10,10 @@ const request = require("request-promise");
 const utils = require('./utils');
 const path = require("path");
 
-const { DOWNLOAD_TYPE, DOWNLOAD_ENDPOINT, DOWNLOAD_ARGS } = require('../src/shared/constants');
+const { DOWNLOAD_TYPE, DOWNLOAD_ENDPOINT, DOWNLOAD_ARGS, DOWNLOAD_STATUS } = require('../src/shared/constants');
 
 
-async function onDownloadSubmit(downloadType,targetDirectory,comicName,comicIssueLinks) {
+async function onDownloadSubmit(downloadType,targetDirectory,comicName,comicIssueLinks,callback) {
     const TD_FULLPATH = makeTargetDirectory(targetDirectory,comicName);
 
     if(downloadType===DOWNLOAD_TYPE.ISSUE) {
@@ -21,7 +21,9 @@ async function onDownloadSubmit(downloadType,targetDirectory,comicName,comicIssu
             let imgList = extractIssuePages();
             console.log('received img links of issue');
             //let TMP_IMG_PATH = prepareForDownload(TD_FULLPATH);
-            createPDF(imgList,comicIssueLinks[0].issueName,TD_FULLPATH);
+            createPDF(imgList,comicIssueLinks[0].issueName,TD_FULLPATH,(resObj)=>{
+                callback(resObj);
+            });
         });
     }
     else {
@@ -39,7 +41,7 @@ function makeTargetDirectory(targetDirectory,comicName) {
 }
 
 async function downloadIssue(downloadLink,destination) {
-    console.log('downloading issue',downloadLink,destination);
+    console.log('downloading issue to',destination);
 
     let options = new Options();
     options.addArguments("--headless");
@@ -48,7 +50,7 @@ async function downloadIssue(downloadLink,destination) {
     options.addArguments("--user-agent=foo");
 
     try {
-        console.log('inside download try-catch block');
+        //console.log('inside download try-catch block');
         var service = await new chrome.ServiceBuilder(driverPath).build();
         chrome.setDefaultService(service);
 
@@ -58,7 +60,7 @@ async function downloadIssue(downloadLink,destination) {
         .setChromeOptions(options)
         .build();
 
-        //console.log('driver build complete',driver);
+        console.log('driver build complete');
 
         await driver.get(downloadLink);
 
@@ -87,21 +89,35 @@ async function downloadIssue(downloadLink,destination) {
     }
     catch(err){
         console.log('Error',err);
+        driver.quit();
     }
 }
 
-function createPDF(imgLinks,issueName,destination) {
+function createPDF(imgLinks,issueName,destination,progressCallback) {
     console.log(`creating pdf of issue ${issueName}`);
+    let resObj = {
+        success:false,
+        status:DOWNLOAD_STATUS.INPROGRESS,
+        percentage:0
+    }
     let pdfDoc = new PDFDocument();
     pdfDoc.pipe(fs.createWriteStream(`${destination}/${issueName}.pdf`));
+    pdfDoc.text(issueName,{align:"center"});
     downloadImages(imgLinks,pdfDoc,(count)=>{
-        trackDownloadProgress(imgLinks.length,count);
+        //trackDownloadProgress(imgLinks.length,count);
         if(count===imgLinks.length) {
             pdfDoc.end();
             console.log("written to pdf",pdfDoc.info);
+            resObj.percentage = 100;
+            resObj.status = DOWNLOAD_STATUS.DONE;
+            resObj.success = true;
         }
+        else {
+            resObj.percentage = ((count/imgLinks.length)*100);
+        }
+        //console.log('calling progress callback');
+        progressCallback(resObj);
     });
-    //pdfDoc.end();
 }
 
 
@@ -124,12 +140,11 @@ function downloadImages(imageLinks,pdfDoc,callback) {
     let c = 0;
     imageLinks.forEach(async(imgLink,i)=>{
         await downloadImage(imgLink,pdfDoc,()=>{
-            console.log(i,'download done');
+            //console.log(i,'download done');
             c+=1;
             callback(c);
         });
     });
-    //pdfDoc.end();
 }
 
 async function downloadImage(url,pdfDoc,callback) {
@@ -140,51 +155,17 @@ async function downloadImage(url,pdfDoc,callback) {
         if(!err && res.statusCode===200) {
             let img = Buffer.from(body,'base64');
             pdfDoc.addPage().image(img,{
-                fit:[521,800],
+                fit:[521,780],
                 align:"left",
                 valign:"top"
             });
             callback();
         }
     })
-    /* Old method of writing image into file */
-    //let file = fs.createWriteStream(path);
-    //await new Promise((resolve,reject)=>{
-        //request({
-            //uri:url,
-            //gzip:true
-        //})
-        //.on("response",(res)=>{
-            //console.log('got image data',res.statusCode,res.headers['content-type']);
-        //})
-        //.pipe(file)
-        //.on('finish',async()=>{
-            //pdfDoc.image(path,0,0);
-            //callback();
-            ////utils.removeFile(path);
-            //resolve();
-        //})
-        //.on("error",(err)=>{
-            //console.log('Error while downloading',err);
-            //reject(err);
-        //})
-    //})
-    //.catch((err)=>{
-        //console.log('something went wrong',err);
-    //})
 }
 
 function trackDownloadProgress(len,count) {
     console.log(`images downloaded ${count}/${len}`);
-}
-
-function prepareForDownload(targetDirectory) {
-    let tmpImgPath = path.join(targetDirectory,'images').toString();
-    console.log(tmpImgPath);
-    if(!fs.existsSync(tmpImgPath)) {
-        fs.mkdirSync(tmpImgPath);
-    }
-    return tmpImgPath;
 }
 
 async function removeSrcFile() {

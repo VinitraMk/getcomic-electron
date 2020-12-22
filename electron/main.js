@@ -26,7 +26,7 @@ function createWindow () {
   mainWindow.on('closed', function () {
     mainWindow = null;
   });
-  mainWindow.setMinimizable(false);
+  //mainWindow.setMinimizable(false);
   mainWindow.maximize();
 }
 app.on('ready', createWindow);

@@ -7,5 +7,9 @@ module.exports = {
         SERIES:"series"
     },
     DOWNLOAD_ENDPOINT:"https://readcomiconline.to",
-    DOWNLOAD_ARGS:"&readType=1"
+    DOWNLOAD_ARGS:"&readType=1",
+    DOWNLOAD_STATUS: {
+        INPROGRESS:"in-progress",
+        DONE:"done"
+    }
 };

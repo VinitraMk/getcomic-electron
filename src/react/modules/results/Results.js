@@ -3,7 +3,7 @@ import { Grid } from '../../components/grid/Grid';
 import { CircularProgressBar } from '../../components/circular-progressbar/CircularProgressBar';
 import Dialog from "../../components/dialog/Dialog";
 import { UNSPECIFIED_TARGET_DIRECTORY_MSG, UNSPECIFIED_TARGET_DIRECTORY_TITLE } from '../../constants/ErrorMessages';
-import { DOWNLOAD_TYPE } from '../../../shared/constants';
+import { DOWNLOAD_STATUS, DOWNLOAD_TYPE } from '../../../shared/constants';
 
 var mainProcess = window.mainProcess;
 
@@ -29,24 +29,18 @@ export class Results extends React.Component {
                     colWidth:"80",
                     actionsTemplate:(row)=>{
                         return row.getTemplate(row);
-                        //if(row.currentAction ==="button") {
-                            //return <button className="gc-btn-link" onClick={()=>this.downloadIssue(row)}>Download</button>
-                        //}
-                        //else if(row.currentAction === "progress") {
-                            //return <CircularProgressBar value={row.actionData.value}/>
-                        //}
                     }
                 }
             ],
             showErrorDialog:false,
             errorMessage:"",
             errorDialogTitle:"",
-            targetDirectory:""
         }
 
         this.prepareTableData = this.prepareTableData.bind(this);
         this.downloadIssue = this.downloadIssue.bind(this);
         this.closeErrorDialog = this.closeErrorDialog.bind(this);
+        this.viewPdf = this.viewPdf.bind(this);
     }
 
     componentDidMount() {
@@ -55,11 +49,29 @@ export class Results extends React.Component {
 
 
     downloadIssue(rowItem) {
-        //console.log('download clicked',rowItem);
-        //let issueList = this.state.issueTableData;a
         if(this.props.targetDirectory!=="") {
             let selectedIssue = this.state.issueTableData.filter(item => item.rowKey === rowItem.rowKey)[0];
-            mainProcess.onDownload(DOWNLOAD_TYPE.ISSUE,this.props.targetDirectory,this.props.seriesName,[{issueLink:selectedIssue.issueLink,issueName:selectedIssue.issueTitle}]);
+            mainProcess.onDownload(
+                DOWNLOAD_TYPE.ISSUE,
+                this.props.targetDirectory,
+                this.props.seriesName,
+                [{issueLink:selectedIssue.issueLink,issueName:selectedIssue.issueTitle}],
+                ((res)=>{
+                    if(res.status==DOWNLOAD_STATUS.INPROGRESS) {
+                        let self = this;
+                        selectedIssue.getTemplate = (rowItem) => {
+                            return <CircularProgressBar value={res.percentage} onClick={()=>{self.cancelDownload(rowItem)}}/>
+                        }
+                        this.updateRowTemplate(selectedIssue);
+                    }
+                    else {
+                        let self = this;
+                        selectedIssue.getTemplate = (rowItem) => {
+                            return <button className="gc-btn-link" onClick={()=>{self.viewPdf(rowItem)}}>View</button>
+                        }
+                        this.updateRowTemplate(selectedIssue);
+                    }
+                }));
             selectedIssue.getTemplate = (rowItem) => {
                 return <CircularProgressBar value={0} onClick={()=>{this.cancelDownload(rowItem)}}/>
             };
@@ -109,6 +121,7 @@ export class Results extends React.Component {
                     issueTitle:item.issueTitle,
                     issueLink:item.issueLink,
                     rowKey:"row-"+item.issueTitle,
+                    relativeDestination:`${this.props.seriesName}/${item.issueTitle}.pdf`,
                     getTemplate:(row) => {
                         return <button className="gc-btn-link" onClick={()=>{this.downloadIssue(row)}}>Download</button>
                     }
@@ -126,6 +139,11 @@ export class Results extends React.Component {
             errorMessage:"",
             errorDialogTitle:""
         });
+    }
+
+    viewPdf(rowItem) {
+        console.log(`${this.props.targetDirectory}${rowItem.relativeDestination}`);
+        mainProcess.openInBrowser(`${this.props.targetDirectory}${rowItem.relativeDestination}`);
     }
 
     render() {
