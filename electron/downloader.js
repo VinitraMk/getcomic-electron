@@ -1,3 +1,5 @@
+var queue = [];
+var IS_DOWNLOAD_INPROGRESS = false;
 var chrome = require("selenium-webdriver/chrome");
 var driverPath = require("chromedriver").path;
 var fs = require("fs");
@@ -9,25 +11,62 @@ const PDFDocument = require('pdfkit');
 const request = require("request-promise");
 const utils = require('./utils');
 const path = require("path");
+var downloadDriver = undefined;
+var TD_FULLPATH = "";
 
 const { DOWNLOAD_TYPE, DOWNLOAD_ENDPOINT, DOWNLOAD_ARGS, DOWNLOAD_STATUS } = require('../src/shared/constants');
 
 
-async function onDownloadSubmit(downloadType,targetDirectory,comicName,comicIssueLinks,callback) {
-    const TD_FULLPATH = makeTargetDirectory(targetDirectory,comicName);
+function onDownloadQueued(downloadType,targetDirectory,comicName,comicIssueLinks,callback) {
+    queue = [
+        ...queue,
+        ...(comicIssueLinks.map(x=>{
+            return {
+                ...x,
+                status:DOWNLOAD_STATUS.QUEUED,
+                targetDirectory:targetDirectory,
+                comicName:comicName,
+                downloadType:downloadType,
+                onDownloadDone:callback
+            }
+        }))
+    ]
+    console.log('Download Queue:',queue);
+    checkQueue();
+}
 
-    if(downloadType===DOWNLOAD_TYPE.ISSUE) {
-        downloadIssue(`${DOWNLOAD_ENDPOINT}${comicIssueLinks[0].issueLink}${DOWNLOAD_ARGS}`,TD_FULLPATH).then(()=>{
-            let imgList = extractIssuePages();
+async function onDownloadSubmit(downloadObject) {
+    TD_FULLPATH = makeTargetDirectory(downloadObject.targetDirectory,downloadObject.comicName);
+
+    if(downloadObject.downloadType==DOWNLOAD_TYPE.ISSUE) {
+        downloadIssue(`${DOWNLOAD_ENDPOINT}${downloadObject.issueLink}${DOWNLOAD_ARGS}`,downloadObject.issueName,TD_FULLPATH).then(()=>{
+            let imgList = extractIssuePages(`source-${downloadObject.issueName}.txt`);
             console.log('received img links of issue');
             //let TMP_IMG_PATH = prepareForDownload(TD_FULLPATH);
-            createPDF(imgList,comicIssueLinks[0].issueName,comicName,TD_FULLPATH,(resObj)=>{
-                callback(resObj);
+            createPDF(imgList,downloadObject.issueName,downloadObject.comicName,TD_FULLPATH,(resObj)=>{
+                if(resObj.success) {
+                    IS_DOWNLOAD_INPROGRESS = false;
+                    queue.shift();
+                    checkQueue();
+                }
+                downloadObject.onDownloadDone(resObj);
             });
         });
     }
     else {
         //for download type series
+    }
+}
+
+function checkQueue() {
+    if(!IS_DOWNLOAD_INPROGRESS && queue.length>0) {
+        queue[0].status = DOWNLOAD_STATUS.INPROGRESS;
+        IS_DOWNLOAD_INPROGRESS = true;
+        console.log('starting download of',queue[0].issueName);
+        onDownloadSubmit(queue[0])
+    }
+    else if(IS_DOWNLOAD_INPROGRESS && queue.length>0) {
+        console.log('download queued');
     }
 }
 
@@ -40,7 +79,7 @@ function makeTargetDirectory(targetDirectory,comicName) {
     return fullPath;
 }
 
-async function downloadIssue(downloadLink,destination) {
+async function downloadIssue(downloadLink,issueName,destination) {
     console.log('downloading issue to',destination);
 
     let options = new Options();
@@ -54,42 +93,41 @@ async function downloadIssue(downloadLink,destination) {
         var service = await new chrome.ServiceBuilder(driverPath).build();
         chrome.setDefaultService(service);
 
-        let driver = await new webdriver.Builder()
+        downloadDriver = await new webdriver.Builder()
         .forBrowser("chrome")
         .withCapabilities(webdriver.Capabilities.chrome())
         .setChromeOptions(options)
         .build();
-
         console.log('driver build complete');
 
-        await driver.get(downloadLink);
+        await downloadDriver.get(downloadLink);
 
-        await driver.wait(webdriver.until.titleContains("comic online")).then(res=>{
+        await downloadDriver.wait(webdriver.until.titleContains("comic online")).then(res=>{
             return (async() =>{
-                await driver.getPageSource().then(res=>{
+                await downloadDriver.getPageSource().then(res=>{
                     return new Promise((resolve,reject)=>{
-                        fs.writeFile("source.txt",res,(err)=>{
+                        fs.writeFile(`source-${issueName}.txt`,res,(err)=>{
                             if(err) throw err;
                             else {
                                 resolve(res);
                                 console.log('quitting driver...');
-                                driver.quit();
+                                downloadDriver.quit();
                             }
                         });
                     })
                 }).catch(err=>{
                     console.log('error while getting src code',err);
-                    driver.quit();
+                    downloadDriver.quit();
                 })
             })();
         }).catch(err=>{
             console.log('error while getting src code match',err);
-            driver.quit();
+            downloadDriver.quit();
         }) 
     }
     catch(err){
         console.log('Error',err);
-        driver.quit();
+        downloadDriver.quit();
     }
 }
 
@@ -122,13 +160,14 @@ function createPDF(imgLinks,issueName,comicName,destination,progressCallback) {
 
 
 
-function extractIssuePages() {
+function extractIssuePages(srcFile) {
     let imgList = [];
-    if(fs.existsSync('source.txt')) {
+    if(fs.existsSync(srcFile)) {
         console.log('got src code');
-        const $ = parser.load(fs.readFileSync("./source.txt"));
+        const $ = parser.load(fs.readFileSync(srcFile));
         imgList = Array.from($('div#divImage img').toArray().map(img=>img.attribs.src));
-        removeSrcFile();
+        //removeSrcFile();
+        utils.removeFile(srcFile);
     }
     else {
         console.log('src file does not exist');
@@ -139,11 +178,6 @@ function extractIssuePages() {
 async function downloadImages(imageLinks,pdfDoc,callback) {
     let c = 0;
     while(c<imageLinks.length) {
-        //downloadImage(imageLinks[c],pdfDoc,()=>{
-            //console.log(c,'download done');
-            //c+=1;
-            //callback(c);
-        //});A
         try {
             let res = await downloadImage(imageLinks[c],pdfDoc);
             //console.log(c,'download done');
@@ -175,25 +209,6 @@ async function downloadImage(url,pdfDoc) {
             }
         })
     })
-    
-
-    //await request({
-        //uri:url,
-        //encoding:null
-    //},(err,res,body)=>{
-        //if(!err && res.statusCode===200) {
-            //let img = Buffer.from(body,'base64');
-            //pdfDoc.addPage().image(img,{
-                //fit:[521,780],
-                //align:"left",
-                //valign:"top"
-            //});
-            //return res;
-        //}
-        //else {
-            //return err;
-        //}
-    //})
 }
 
 function trackDownloadProgress(len,count) {
@@ -215,5 +230,5 @@ async function removeSrcFile() {
     }
 }
 module.exports = {
-    onDownloadSubmit
+    onDownloadQueued
 }

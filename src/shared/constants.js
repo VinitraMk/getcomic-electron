@@ -10,6 +10,7 @@ module.exports = {
     DOWNLOAD_ARGS:"&readType=1",
     DOWNLOAD_STATUS: {
         INPROGRESS:"in-progress",
-        DONE:"done"
+        DONE:"done",
+        QUEUED:"queued"
     }
 };

@@ -13,7 +13,7 @@ exports.onSubmit = (url,seriesName) => {
 };
  
 exports.onDownload = (downloadType,targetDirectory,comicName,comicIssueLinks,callback) => {
-    downloader.onDownloadSubmit(downloadType,targetDirectory,comicName,comicIssueLinks,(res)=>{
+    downloader.onDownloadQueued(downloadType,targetDirectory,comicName,comicIssueLinks,(res)=>{
         //console.log('calling react callback',res);
         callback(res);
     })

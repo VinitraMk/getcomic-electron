@@ -30,19 +30,19 @@ async function getSeriesSourceCode(url,seriesName) {
         var service = await new chrome.ServiceBuilder(driverPath).build();
         chrome.setDefaultService(service);
 
-        let driver = await new webdriver.Builder()
+        let scraperDriver = await new webdriver.Builder()
         .forBrowser("chrome")
         .withCapabilities(webdriver.Capabilities.chrome())
         .setChromeOptions(options)
         .build();
 
-        await driver.get(url);
+        await scraperDriver.get(url);
         console.log('driver build complete');
 
-        await driver.wait(webdriver.until.titleContains("comic online")).then(src=>{
+        await scraperDriver.wait(webdriver.until.titleContains("comic online")).then(src=>{
             //console.log('element found');
             return (async() =>{
-                await driver.getPageSource().then(res=>{
+                await scraperDriver.getPageSource().then(res=>{
                     return (async()=>{
                         console.log("writing into file, please wait...");
                         return new Promise((resolve,reject)=>{
@@ -51,7 +51,7 @@ async function getSeriesSourceCode(url,seriesName) {
                                 else {
                                     resolve(res);
                                     console.log('quitting driver...');
-                                    driver.quit();
+                                    scraperDriver.quit();
                                 }
                             });
                         })
@@ -60,19 +60,19 @@ async function getSeriesSourceCode(url,seriesName) {
             })();
         })
         .catch(err=>{
-            driver.getTitle().then(title=>{
+            scraperDriver.getTitle().then(title=>{
                 console.log(title);
             }).catch(err=>{
                 console.log(err);
-                driver.quit();
+                scraperDriver.quit();
             });
             console.log(err);
-            driver.quit();
+            scraperDriver.quit();
         })
     }
     catch(err) {
         console.log('error',err);
-        driver.quit();
+        scraperDriver.quit();
     }
 }
 
