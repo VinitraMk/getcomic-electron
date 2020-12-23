@@ -116,7 +116,6 @@ function createPDF(imgLinks,issueName,comicName,destination,progressCallback) {
         else {
             resObj.percentage = ((count/imgLinks.length)*100);
         }
-        //console.log('calling progress callback');
         progressCallback(resObj);
     });
 }
@@ -137,32 +136,64 @@ function extractIssuePages() {
     return imgList;
 }
 
-function downloadImages(imageLinks,pdfDoc,callback) {
+async function downloadImages(imageLinks,pdfDoc,callback) {
     let c = 0;
-    imageLinks.forEach(async(imgLink,i)=>{
-        await downloadImage(imgLink,pdfDoc,()=>{
-            //console.log(i,'download done');
+    while(c<imageLinks.length) {
+        //downloadImage(imageLinks[c],pdfDoc,()=>{
+            //console.log(c,'download done');
+            //c+=1;
+            //callback(c);
+        //});A
+        try {
+            let res = await downloadImage(imageLinks[c],pdfDoc);
+            //console.log(c,'download done');
             c+=1;
             callback(c);
-        });
-    });
+        }
+        catch(err) {
+            console.log("Error while getting downloadedl link",err);
+            return;
+        }
+    }
+    
 }
 
-async function downloadImage(url,pdfDoc,callback) {
-    await request({
-        uri:url,
-        encoding:null
-    },(err,res,body)=>{
-        if(!err && res.statusCode===200) {
-            let img = Buffer.from(body,'base64');
-            pdfDoc.addPage().image(img,{
-                fit:[521,780],
-                align:"left",
-                valign:"top"
-            });
-            callback();
-        }
+async function downloadImage(url,pdfDoc) {
+    
+    return new Promise((resolve,reject)=>{
+        request({uri:url,encoding:null},
+        (err,res,body)=>{
+            if(err) reject(err);
+            else {
+                let img = Buffer.from(body,'base64');
+                pdfDoc.addPage().image(img,{
+                    fit:[521,780],
+                    align:"left",
+                    valign:"top"
+                });
+                resolve(res);
+            }
+        })
     })
+    
+
+    //await request({
+        //uri:url,
+        //encoding:null
+    //},(err,res,body)=>{
+        //if(!err && res.statusCode===200) {
+            //let img = Buffer.from(body,'base64');
+            //pdfDoc.addPage().image(img,{
+                //fit:[521,780],
+                //align:"left",
+                //valign:"top"
+            //});
+            //return res;
+        //}
+        //else {
+            //return err;
+        //}
+    //})
 }
 
 function trackDownloadProgress(len,count) {
