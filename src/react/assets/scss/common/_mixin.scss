@@ -88,3 +88,10 @@
   justify-content: center;
   align-items: center;
 }
+
+@mixin container-center-top() {
+  display: flex;
+  flex-flow: column;
+  justify-content: end;
+  align-items: center;
+}

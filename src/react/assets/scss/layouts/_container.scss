@@ -4,6 +4,13 @@
             @include container-all-center;
             padding:pxToRem(80) 0;
             margin:0 pxToRem(40);
+            height: 100%;
+        }
+        &-ct {
+            @include container-center-top;
+            padding:pxToRem(80) 0;
+            margin:0 pxToRem(40);
+            height: 100%;
         }
     }
 }

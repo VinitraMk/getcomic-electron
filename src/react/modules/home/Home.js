@@ -133,7 +133,7 @@ export default class Home extends React.Component {
                 {this.state.showResults && <span className="gc-icn gc-icn-back" onClick={this.goToHome}>
                     <i className="fa fa-arrow-left fc--red"></i>
                 </span>}
-                <div className="gc-container-ac">
+                <div className="gc-container-ct">
                     {!this.state.showResults && <h1 className="gc-root-title">Getcomic</h1>}
                     {!this.state.showResults && <form onSubmit={this.searchForComics} className="m-b-4">
                         <div className={`gc-input-group ${this.state.isUrlInvalid ? "error-input" : ""}`}>

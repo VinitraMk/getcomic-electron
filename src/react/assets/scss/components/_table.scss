@@ -6,15 +6,36 @@
         border:1px solid $color-primary;
         width:100%;
         background-color:$color-secondary;
+        height: calc(100% - 100px);
 
         & thead {
             background:$color-primary;
             color:$color-secondary;
+            display: block;
+            width: 100%;
         }
+
+        & tbody {
+            display: block;
+            width: 100%;
+            height: calc(100% - 32px);
+            overflow:auto;
+        }
+
+        & thead > tr, & tbody tr {
+            width: 100%;
+            display: table;
+        }
+
 
         & td, & th {
             padding:5px 5px 5px 10px;
             text-align: left;
+        }
+
+        & thead th:last-child {
+            text-align: right;
+            padding-right:pxToRem(30);
         }
 
         & td:last-child, & th:last-child {
