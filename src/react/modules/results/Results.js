@@ -4,6 +4,7 @@ import { CircularProgressBar } from '../../components/circular-progressbar/Circu
 import Dialog from "../../components/dialog/Dialog";
 import { UNSPECIFIED_TARGET_DIRECTORY_MSG, UNSPECIFIED_TARGET_DIRECTORY_TITLE } from '../../constants/ErrorMessages';
 import { DOWNLOAD_STATUS, DOWNLOAD_TYPE } from '../../../shared/constants';
+import { FILE_STATUS } from "../../constants/AppConstants";
 import * as arrUtils from "../../utilities/ArrayUtils";
 var mainProcess = window.mainProcess;
 
@@ -73,7 +74,7 @@ export class Results extends React.Component {
                     else {
                         let self = this;
                         selectedIssue.getTemplate = (rowItem) => {
-                            return <button className="gc-btn-link" onClick={()=>{self.viewPdf(rowItem)}}>View</button>
+                            return <button className="gc-btn-link" onClick={()=>{self.viewPdf(rowItem)}}>{FILE_STATUS.READ}</button>
                         }
                         this.updateRowTemplate(selectedIssue);
                     }
@@ -100,7 +101,7 @@ export class Results extends React.Component {
         let selectedIssue = this.state.issueTableData.filter(item => item.rowKey === rowItem.rowKey)[0];
 
         selectedIssue.getTemplate = (rowItem) => {
-            return <button className="gc-btn-link" onClick={()=>{this.downloadIssue(rowItem)}}>Download</button>
+            return <button className="gc-btn-link" onClick={()=>{this.downloadIssue(rowItem)}}>{FILE_STATUS.DOWNLOAD}</button>
         }
 
         this.updateRowTemplate(selectedIssue);
@@ -130,10 +131,10 @@ export class Results extends React.Component {
                     relativeDestination:`${this.props.seriesName}/${item.issueTitle}.pdf`,
                     getTemplate:(row) => {
                         if(item.isDownloaded) {
-                            return <button className="gc-btn-link" onClick={()=>{this.viewPdf(row)}}>View</button>
+                            return <button className="gc-btn-link" onClick={()=>{this.viewPdf(row)}}>{FILE_STATUS.READ}</button>
                         }
                         else {
-                            return <button className="gc-btn-link" onClick={()=>{this.downloadIssue(row)}}>Download</button>
+                            return <button className="gc-btn-link" onClick={()=>{this.downloadIssue(row)}}>{FILE_STATUS.DOWNLOAD}</button>
                         }
                     }
                 })

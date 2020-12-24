@@ -14,7 +14,7 @@ const path = require("path");
 var downloadDriver = undefined;
 var TD_FULLPATH = "";
 
-const { DOWNLOAD_TYPE, DOWNLOAD_ENDPOINT, DOWNLOAD_ARGS, DOWNLOAD_STATUS } = require('../src/shared/constants');
+const { DOWNLOAD_TYPE, DOWNLOAD_ENDPOINT, DOWNLOAD_ARGS, DOWNLOAD_STATUS, PAGE_SIZE } = require('../src/shared/constants');
 
 
 function onDownloadQueued(downloadType,targetDirectory,comicName,comicIssueLinks,callback) {
@@ -31,7 +31,6 @@ function onDownloadQueued(downloadType,targetDirectory,comicName,comicIssueLinks
             }
         }))
     ]
-    console.log('Download Queue:',queue);
     checkQueue();
 }
 
@@ -138,7 +137,15 @@ function createPDF(imgLinks,issueName,comicName,destination,progressCallback) {
         status:DOWNLOAD_STATUS.INPROGRESS,
         percentage:0
     }
-    let pdfDoc = new PDFDocument();
+    let pdfDoc = new PDFDocument({
+        size:PAGE_SIZE,
+        margins:{
+            top:20,
+            left:20,
+            right:20,
+            bottom:20
+        }
+    });
     pdfDoc.pipe(fs.createWriteStream(`${destination}/${issueName}.pdf`));
     pdfDoc.text(comicName,{align:"center"});
     pdfDoc.text(issueName,{align:"center",valign:"center"});
@@ -201,7 +208,7 @@ async function downloadImage(url,pdfDoc) {
             else {
                 let img = Buffer.from(body,'base64');
                 pdfDoc.addPage().image(img,{
-                    fit:[521,780],
+                    fit:PAGE_SIZE,
                     align:"left",
                     valign:"top"
                 });

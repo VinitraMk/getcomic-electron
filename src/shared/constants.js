@@ -12,5 +12,6 @@ module.exports = {
         INPROGRESS:"in-progress",
         DONE:"done",
         QUEUED:"queued"
-    }
+    },
+    PAGE_SIZE: [650,1004]
 };
