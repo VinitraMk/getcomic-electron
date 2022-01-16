@@ -126,7 +126,7 @@ export default class Home extends React.Component {
     checkForExistingDownloads() {
         this.setState((prevState)=> {
             return {
-                issueList: mainProcess.searchFilesExist(prevState.issueList,`${this.state.targetDirectory}${prevState.seriesName}`)
+                issueList: mainProcess.searchFilesExist(prevState.issueList,`${this.state.targetDirectory}/${prevState.seriesName}`)
             }
         })
     }
