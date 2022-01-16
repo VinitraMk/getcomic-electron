@@ -5,6 +5,7 @@ import {Results} from "../results/Results";
 import {DEFAULT_URL, NO_TD_MSG} from "../../constants/AppConstants";
 import { EMPTY_TD_MSG, EMPTY_TD_TITLE } from "../../constants/ErrorMessages";
 import Dialog from "../../components/dialog/Dialog";
+import { userInfo } from 'os';
 var mainProcess = window.mainProcess;
 
 export default class Home extends React.Component {
@@ -91,24 +92,27 @@ export default class Home extends React.Component {
     }
 
     onTargetChange(event) {
-        if(event.target.files.length>0) {
-            let fileName = event.target.files[0].name;
-            let filePath = event.target.files[0].path;
-            let path = filePath.substring(0,filePath.indexOf(fileName));
-            this.setState({
-                targetDirectory:path,
-            },()=>{
-                this.checkForExistingDownloads();
-            });
+        this.setState({
+            targetDirectory: event.target.value
+        });
+        //if(event.target.files.length>0) {
+            //let fileName = event.target.files[0].name;
+            //let filePath = event.target.files[0].path;
+            //let path = filePath.substring(0,filePath.indexOf(fileName));
+            //this.setState({
+                //targetDirectory:path,
+            //},()=>{
+                //this.checkForExistingDownloads();
+            //});
             
-        }
-        else {
-            this.setState({
-                showErrorDialog:true,
-                errorDialogTitle:EMPTY_TD_TITLE,
-                errorMessage:EMPTY_TD_MSG
-            });
-        }
+        //}
+        //else {
+            //this.setState({
+                //showErrorDialog:true,
+                //errorDialogTitle:EMPTY_TD_TITLE,
+                //errorMessage:EMPTY_TD_MSG
+            //});
+        //}
     }
 
     closeErrorDialog() {
@@ -145,14 +149,23 @@ export default class Home extends React.Component {
                         </div>
                         {this.state.isUrlInvalid && <span className="error-message">The url is invalid!</span>}
                     </form>}
-                    {this.state.showResults && 
-                        <label className="gc-input-group gc-input-file">
+                    {this.state.showResults &&
+                    <>
+                        {/*<label className="gc-input-group gc-input-file">
                             <input type="file" 
                             onChange={this.onTargetChange}
                             webkitdirectory="true"
                             />
                             <span className="gc-input-file__action" data-filepath={`${this.state.targetDirectory ? this.state.targetDirectory : NO_TD_MSG}`}></span>
-                        </label>
+                    </label>*/}
+                        <div className={`gc-input-group m-b-4`}>
+                            <input type="text" className="gc-input-control gc-input-control--search" 
+                            placeholder="Enter target directory path here"
+                            value={this.state.targetDirectory}
+                            onChange={this.onTargetChange}/>
+                            <button type="submit" className="gc-btn gc-btn-primary">Set Target Directory</button>
+                        </div>
+                    </>
                     }
                     {this.state.showLoader && <Loader message="Fetching Results"/>}
                     {this.state.showResults && <Results seriesName={this.state.seriesName} issueList={this.state.issueList} targetDirectory={this.state.targetDirectory}/>}
