@@ -2,10 +2,12 @@ import React from "react";
 import Loader from "../../components/loader/Loader";
 import {isUrlValid} from "../../utilities/UrlValidators";
 import {Results} from "../results/Results";
-import {DEFAULT_URL, NO_TD_MSG} from "../../constants/AppConstants";
-import { EMPTY_TD_MSG, EMPTY_TD_TITLE } from "../../constants/ErrorMessages";
+import { DEFAULT_URL } from "../../constants/AppConstants";
 import Dialog from "../../components/dialog/Dialog";
-import { userInfo } from 'os';
+import { join } from 'path';
+import { CHECKING_FOR_DOWNLOADS_MSG, FETCHING_RESULTS_MESSAGE } from "../../../shared/constants";
+import { UNSPECIFIED_TARGET_DIRECTORY_MSG, UNSPECIFIED_TARGET_DIRECTORY_TITLE } from "../../constants/ErrorMessages";
+
 var mainProcess = window.mainProcess;
 
 export default class Home extends React.Component {
@@ -22,7 +24,10 @@ export default class Home extends React.Component {
             showErrorDialog:false,
             errorDialogTitle:"",
             errorMessage:"",
-            seriesName:""
+            seriesName:"",
+            loaderMessage: FETCHING_RESULTS_MESSAGE,
+            downloadAllToggler: true,
+            isDownloadAllEnabled: true
         }
         this.searchForComics = this.searchForComics.bind(this);
         this.onUrlChange = this.onUrlChange.bind(this);
@@ -30,6 +35,8 @@ export default class Home extends React.Component {
         this.onTargetChange = this.onTargetChange.bind(this);
         this.closeErrorDialog = this.closeErrorDialog.bind(this);
         this.checkForExistingDownloads = this.checkForExistingDownloads.bind(this);
+        this.setTargetDirectory = this.setTargetDirectory.bind(this);
+        this.downloadAll = this.downloadAll.bind(this);
         this.targetDirInp = React.createRef();
         mainProcess = window.mainProcess;
     }
@@ -39,7 +46,8 @@ export default class Home extends React.Component {
     searchForComics(e) {
         //console.log(this.state.url);
         this.setState({
-            showLoader:true
+            showLoader:true,
+            loaderMessage: FETCHING_RESULTS_MESSAGE
         });
         e.preventDefault();
 
@@ -87,32 +95,36 @@ export default class Home extends React.Component {
 
     goToHome() {
         this.setState({
-            showResults:false
+            showResults:false,
+            issueList: [],
+            targetDirectory: ""
         })
     }
 
     onTargetChange(event) {
         this.setState({
             targetDirectory: event.target.value
-        });
-        //if(event.target.files.length>0) {
-            //let fileName = event.target.files[0].name;
-            //let filePath = event.target.files[0].path;
-            //let path = filePath.substring(0,filePath.indexOf(fileName));
-            //this.setState({
-                //targetDirectory:path,
-            //},()=>{
-                //this.checkForExistingDownloads();
-            //});
-            
-        //}
-        //else {
-            //this.setState({
-                //showErrorDialog:true,
-                //errorDialogTitle:EMPTY_TD_TITLE,
-                //errorMessage:EMPTY_TD_MSG
-            //});
-        //}
+        })
+    }
+
+    setTargetDirectory() {
+        let pathname = this.state.targetDirectory;
+        if (pathname !== "" && !pathname.includes(this.state.seriesName)) {
+            this.setState((prevState) => ({
+                targetDirectory: join(pathname, prevState.seriesName),
+                showLoader: true,
+                loaderMessage: CHECKING_FOR_DOWNLOADS_MSG
+            }));
+            this.checkForExistingDownloads();
+        } else if (pathname === "") {
+            this.setState({
+                showErrorDialog: true,
+                errorDialogTitle: UNSPECIFIED_TARGET_DIRECTORY_TITLE,
+                errorMessage: UNSPECIFIED_TARGET_DIRECTORY_MSG
+            })
+        } else {
+            this.checkForExistingDownloads();
+        }
     }
 
     closeErrorDialog() {
@@ -124,11 +136,25 @@ export default class Home extends React.Component {
     }
 
     checkForExistingDownloads() {
-        this.setState((prevState)=> {
-            return {
-                issueList: mainProcess.searchFilesExist(prevState.issueList,`${this.state.targetDirectory}/${prevState.seriesName}`)
-            }
-        })
+        if (this.state.targetDirectory !== "") {
+            this.setState((prevState)=> {
+                return {
+                    issueList: mainProcess.searchFilesExist(prevState.issueList,`${prevState.targetDirectory}`),
+                }
+            }, () => {
+                this.setState(prevState => ({
+                    showLoader: false,
+                    loaderMessage: "",
+                    isDownloadAllEnabled: prevState.issueList.filter(x => x.isDownloaded === true).length !== prevState.issueList.length
+                }));
+            });
+        }
+    }
+
+    downloadAll() {
+        this.setState(prevState => ({
+            downloadAllToggler: !prevState.downloadAllToggler
+        }));
     }
 
     render() {
@@ -151,24 +177,20 @@ export default class Home extends React.Component {
                     </form>}
                     {this.state.showResults &&
                     <>
-                        {/*<label className="gc-input-group gc-input-file">
-                            <input type="file" 
-                            onChange={this.onTargetChange}
-                            webkitdirectory="true"
-                            />
-                            <span className="gc-input-file__action" data-filepath={`${this.state.targetDirectory ? this.state.targetDirectory : NO_TD_MSG}`}></span>
-                    </label>*/}
                         <div className={`gc-input-group m-b-4`}>
                             <input type="text" className="gc-input-control gc-input-control--search" 
                             placeholder="Enter target directory path here"
                             value={this.state.targetDirectory}
                             onChange={this.onTargetChange}/>
-                            <button type="submit" className="gc-btn gc-btn-primary">Set Target Directory</button>
+                            <button type="button" onClick={this.setTargetDirectory} className="gc-btn gc-btn-primary">Set Target Directory</button>
+                        </div>
+                        <div className="w-100 text-right m-b-4">
+                            {this.state.isDownloadAllEnabled && <button className="gc-btn-link" onClick={this.downloadAll}>Download All</button>}
                         </div>
                     </>
                     }
-                    {this.state.showLoader && <Loader message="Fetching Results"/>}
-                    {this.state.showResults && <Results seriesName={this.state.seriesName} issueList={this.state.issueList} targetDirectory={this.state.targetDirectory}/>}
+                    {this.state.showLoader && <Loader message={this.state.loaderMessage} />}
+                    {this.state.showResults && <Results seriesName={this.state.seriesName} issueList={this.state.issueList} targetDirectory={this.state.targetDirectory} downloadAllToggler={this.state.downloadAllToggler}/>}
                     {this.state.showErrorDialog && <Dialog title={this.state.errorDialogTitle} message={this.state.errorMessage} onDismiss={this.closeErrorDialog}/>}
                 </div>
             </>

@@ -2,7 +2,9 @@
   "productName": "Getcomic",
   "main": "electron/main.js",
   "name": "hello-electronreact",
-  "version": "0.1.0",
+  "version": "0.2.1",
+  "author": "VinitraMk",
+  "description": "An electron app to download comics from readcomiconline",
   "private": true,
   "homepage": "./",
   "dependencies": {
@@ -76,12 +78,17 @@
   "build": {
     "files": [
       "build/**/*",
-      "node_modules/**/*"
+      "node_modules/**/*",
+      "package.json"
     ],
     "publish": {
       "provider": "github",
-      "repo": "electron-cra-example",
-      "owner": "johndyer24"
+      "repo": "getcomic-electron",
+      "owner": "VinitraMk"
+    },
+    "asar": false,
+    "win": {
+      "icon": "electron/getcomic-logo.ico"
     }
   },
   "scripts": {
@@ -89,7 +96,7 @@
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
     "start-electron": "set ELECTRON_START_URL=http://localhost:3000 && electron --debug .",
-    "build-electron": "mkdir build/src && robocopy electron build/electron /S & robocopy src/shared build/src/shared /S",
+    "build-electron": "mkdirp build/electron build/src/shared && robocopy electron build/electron & robocopy src/shared build/src/shared",
     "package": "electron-builder build --win -c.extraMetadata.main=build/electron/main.js --publish never"
   },
   "eslintConfig": {
@@ -110,8 +117,8 @@
   "devDependencies": {
     "electron": "^9.2.0",
     "electron-builder": "^22.8.0",
-    "sass-loader": "^9.0.3",
-    "node-sass": "^4.14.1"
+    "node-sass": "^4.14.1",
+    "sass-loader": "^9.0.3"
   },
   "jest": {
     "roots": [

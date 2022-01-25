@@ -1,8 +1,8 @@
 export const APP_NAME = "Getcomic";
 
-export const DEFAULT_URL = "https://readcomiconline.to/Comic/Iron-Man-1968";
+//export const DEFAULT_URL = "https://readcomiconline.to/Comic/Batman-Hush";
 
-export const DEFAULT_TD = `C:\\Users\\vimurali\\Downloads\\`;
+export const DEFAULT_URL = "";
 
 export const NO_TD_MSG = "Select a targer directory to put your downloads";
 

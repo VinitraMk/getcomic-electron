@@ -34,6 +34,19 @@ function onDownloadQueued(downloadType,targetDirectory,comicName,comicIssueLinks
     checkQueue();
 }
 
+function onDownloadCancelled(issueTitle, cancelCallback) {
+    let comicIndex = queue.findIndex(x => x.issueTitle === issueTitle);
+    let isDownloadCancelled = false;
+    if (comicIndex !== -1 && queue[comicIndex].status === DOWNLOAD_STATUS.INPROGRESS) {
+        console.log(`Download of ${issueTitle} cannot be cancelled...`);
+    } else {
+        queue = queue.filter(x => x.issueTitle === issueTitle);
+        console.log(`Download of ${issueTitle} cancelled...`);
+        isDownloadCancelled = true;
+    }
+    cancelCallback(isDownloadCancelled);
+}
+
 async function onDownloadSubmit(downloadObject) {
     TD_FULLPATH = makeTargetDirectory(downloadObject.targetDirectory,downloadObject.comicName);
 
@@ -71,11 +84,12 @@ function checkQueue() {
 
 
 function makeTargetDirectory(targetDirectory,comicName) {
-    let fullPath = `${targetDirectory}${comicName}`;
-    if(!fs.existsSync(fullPath)) {
-        fs.mkdirSync(fullPath)
+    //let fullPath = `${targetDirectory}/${comicName}`;
+    //let fullPath = path.join(targetDirectory, comicName)
+    if(!fs.existsSync(targetDirectory)) {
+        fs.mkdirSync(targetDirectory)
     }
-    return fullPath;
+    return targetDirectory;
 }
 
 async function downloadIssue(downloadLink,issueName,destination) {
@@ -237,5 +251,6 @@ async function removeSrcFile() {
     }
 }
 module.exports = {
-    onDownloadQueued
+    onDownloadQueued,
+    onDownloadCancelled
 }

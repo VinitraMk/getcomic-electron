@@ -19,6 +19,12 @@ exports.onDownload = (downloadType,targetDirectory,comicName,comicIssueLinks,cal
     })
 }
 
+exports.onDownloadCancelled = (issueTitle, callback) => {
+    downloader.onDownloadCancelled(issueTitle, (res) => {
+        callback(res);
+    });
+}
+
 exports.openInBrowser = (url) => {
     external.openInBrowser(url);
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { Grid } from '../../components/grid/Grid';
 import { CircularProgressBar } from '../../components/circular-progressbar/CircularProgressBar';
 import Dialog from "../../components/dialog/Dialog";
-import { UNSPECIFIED_TARGET_DIRECTORY_MSG, UNSPECIFIED_TARGET_DIRECTORY_TITLE } from '../../constants/ErrorMessages';
+import { SERIES_NAME_NOT_SET_MESSAGE, SERIES_NAME_NOT_SET_TITLE, UNSPECIFIED_TARGET_DIRECTORY_MSG, UNSPECIFIED_TARGET_DIRECTORY_TITLE } from '../../constants/ErrorMessages';
 import { DOWNLOAD_STATUS, DOWNLOAD_TYPE } from '../../../shared/constants';
 import { FILE_STATUS } from "../../constants/AppConstants";
 import * as arrUtils from "../../utilities/ArrayUtils";
@@ -41,6 +41,7 @@ export class Results extends React.Component {
         this.prepareTableData = this.prepareTableData.bind(this);
         this.downloadIssue = this.downloadIssue.bind(this);
         this.closeErrorDialog = this.closeErrorDialog.bind(this);
+        this.downloadAllIssues = this.downloadAllIssues.bind(this);
         this.viewPdf = this.viewPdf.bind(this);
     }
 
@@ -56,7 +57,9 @@ export class Results extends React.Component {
 
 
     downloadIssue(rowItem) {
-        if(this.props.targetDirectory!=="") {
+        let isTargetDirectoryDefined = this.props.targetDirectory !== "" && this.props.targetDirectory !== null && this.props.targetDirectory !== undefined;
+        let isSeriesSetInTarget = this.props.targetDirectory.includes(this.props.seriesName);
+        if(isTargetDirectoryDefined && isSeriesSetInTarget) {
             let selectedIssue = this.state.issueTableData.filter(item => item.rowKey === rowItem.rowKey)[0];
             mainProcess.onDownload(
                 DOWNLOAD_TYPE.ISSUE,
@@ -83,6 +86,12 @@ export class Results extends React.Component {
                 return <CircularProgressBar value={0} onClick={()=>{this.cancelDownload(rowItem)}}/>
             };
             this.updateRowTemplate(selectedIssue);
+        } else if(isTargetDirectoryDefined && !isSeriesSetInTarget) {
+            this.setState({
+                errorMessage: SERIES_NAME_NOT_SET_MESSAGE,
+                errorDialogTitle: SERIES_NAME_NOT_SET_TITLE,
+                showErrorDialog: true
+            });
         }
         else {
             this.setState({
@@ -98,13 +107,15 @@ export class Results extends React.Component {
     cancelDownload(rowItem) {
         //let issueList = this.state.issueTableData;
         //console.log('clicked cancel');
-        let selectedIssue = this.state.issueTableData.filter(item => item.rowKey === rowItem.rowKey)[0];
-
-        selectedIssue.getTemplate = (rowItem) => {
-            return <button className="gc-btn-link" onClick={()=>{this.downloadIssue(rowItem)}}>{FILE_STATUS.DOWNLOAD}</button>
-        }
-
-        this.updateRowTemplate(selectedIssue);
+        mainProcess.onDownloadCancelled(rowItem.issueTitle, (res) => {
+            if (res) {
+                let selectedIssue = this.state.issueTableData.filter(item => item.rowKey === rowItem.rowKey)[0];
+                selectedIssue.getTemplate = (rowItem) => {
+                    return <button className="gc-btn-link" onClick={()=>{this.downloadIssue(rowItem)}}>{FILE_STATUS.DOWNLOAD}</button>
+                }
+                this.updateRowTemplate(selectedIssue);
+            }
+        });
     }
 
     updateRowTemplate(selectedRow) {
@@ -128,7 +139,7 @@ export class Results extends React.Component {
                     issueTitle:item.issueTitle,
                     issueLink:item.issueLink,
                     rowKey:"row-"+item.issueTitle,
-                    relativeDestination:`${this.props.seriesName}/${item.issueTitle}.pdf`,
+                    relativeDestination:`/${item.issueTitle}.pdf`,
                     getTemplate:(row) => {
                         if(item.isDownloaded) {
                             return <button className="gc-btn-link" onClick={()=>{this.viewPdf(row)}}>{FILE_STATUS.READ}</button>
@@ -156,6 +167,16 @@ export class Results extends React.Component {
     viewPdf(rowItem) {
         console.log(`${this.props.targetDirectory}${rowItem.relativeDestination}`);
         mainProcess.openInBrowser(`${this.props.targetDirectory}${rowItem.relativeDestination}`);
+    }
+
+    downloadAllIssues() {
+        this.state.issueTableData.forEach(x => this.downloadIssue(x));
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.downloadAllToggler !== this.props.downloadAllToggler) {
+            this.downloadAllIssues();
+        }
     }
 
     render() {
