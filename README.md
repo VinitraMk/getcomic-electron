@@ -1,8 +1,10 @@
-# getcomic-cli 
+# getcomic-electron
 
-[![forthebadge made-with-electron](https://forthebadge.com/generator/?plabel=Made+With&slabel=Electron)](https://www.electronjs.org/)
-[![forthebadge made-with-electron](https://forthebadge.com/generator/?plabel=Made+With&slabel=React)](https://reactjs.org/)
-A command line tool to download comics from readcomiconline.to
+[![forthebadge made-with-electron](/src/react/assets/images/made-with-electron.svg)](https://www.electronjs.org/)
+
+[![forthebadge made-with-electron](/src/react/assets/images/made-with-react.svg)](https://reactjs.org/)
+
+An electron app to download comics from readcomiconline.to
 
 ## Features
 * Download comics from readcomiconline.to by providing the url of a single issue of a comic 
