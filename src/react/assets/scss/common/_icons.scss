@@ -1,86 +1,23 @@
 /* _icons.scss - Classes for modifying icons */
-
-#{$tsl}-icn {
-  cursor: pointer;
-  &:not(.tsl-icn__header):not(.tsl-aside__toggler--icon):not(.mn-icon--no-hover):hover {
-    path {
-      fill:map-get($blue,"1996FF");
-    }
-  }
-  &__header.active {
-    & path {
-      fill:white;
-    }
-  }
-  &__arrow {
-    border: solid map-get($gray,"747487");
-    border-width: 0 1.5px 1.5px 0;
-    display: inline-block;
-    padding: 3.5px;
+.gc {
+  &-icn {
     cursor: pointer;
+    &-back {
+      position: fixed;
+      top:pxToRem(20);
+      left:pxToRem(20);
+      background:$color-secondary;
+      border-radius:50%;
+      height:pxToRem(40);
+      width:pxToRem(40);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-    &--down {
-      -webkit-transform: rotate(45deg);
-      transform: rotate(45deg);
-      position: absolute;
-      top: pxToRem(40);
-      right: pxToRem(5);
+    &-progress {
+      height: pxToRem(40);
+      width: pxToRem(40);
     }
-  }
-  &-eye {
-    position: absolute;
-    top: 20px;
-    right: 10px;
-  }
-  &__search {
-    &--left {
-      position: absolute;
-      top: 7px;
-      left: 0;
-      + #{$tsl}-form__control {
-        padding-left: 34px;
-      }
-    }
-    &--right {
-      position: absolute;
-      top: pxToRem(39);
-      right: 7px;
-      width: 13px;
-      height: 13px;
-      + #{$tsl}-form__control {
-        padding-left: 10px;
-      }
-    }
-  }
-
-  &--danger {
-    &::after {
-      content: "";
-      //background:url("../../../assets/images/addcircleoutline.svg") left top no-repeat;
-      position: absolute;
-      right: -25px;
-      bottom: 41px;
-      z-index: 1000;
-      width: 13px;
-      height: 13px;
-    }
-  }
-  &--success {
-    &::after {
-      content: "";
-      //background: url("../../../assets/images/checkcircleoutline.svg") left top no-repeat;
-      position: absolute;
-      right: -25px;
-      bottom: 41px;
-      z-index: 1000;
-      width: 13px;
-      height: 13px;
-    }
-  }
-}
-
-#{$tsl}-icn {
-  &--flip {
-    transform: rotate(180deg);
   }
 }

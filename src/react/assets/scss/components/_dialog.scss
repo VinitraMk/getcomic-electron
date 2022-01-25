@@ -1,0 +1,44 @@
+.gc {
+    &-dialog {
+        height: 100%;
+        width: 100%;
+        position:fixed;
+        top:0;
+        left:0;
+        display: flex;
+        background:rgba(255,255,255,0.75);
+
+        &__content {
+            height: pxToRem(250);
+            width: pxToRem(350);
+            margin: auto;
+            border-radius:pxToRem(4); 
+            border:1px solid $color-primary; 
+            background:$color-secondary; 
+        }
+           
+        &__header, &__footer {
+            font-size:pxToRem(12);
+        }
+
+        &__header {
+            color:black;
+            border-bottom:1px solid $color-primary;
+            padding:pxToRem(20);
+            font-size:pxToRem(16);
+            font-weight: bold;
+        }
+
+        &__footer {
+            background:$color-primary;
+            text-align: right;
+            padding:pxToRem(10) pxToRem(20);
+        }
+
+        &__body {
+            font-size:pxToRem(12);
+            padding:pxToRem(20);
+            height:calc(100% - 120px);
+        }
+    }
+}

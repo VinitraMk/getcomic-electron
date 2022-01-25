@@ -2,12 +2,47 @@
     &-btn {
         padding:pxToRem(15) pxToRem(24);
         border-radius:pxToRem(15);
+        cursor: pointer;
+
+        :disabled {
+            pointer-events: none;
+            cursor: not-allowed;
+        }
 
         &-primary {
             background-color: $color-primary;
             color:$color-secondary;
             border-color:$color-primary;
             border-style:solid;
+        }
+
+        &-link {
+            padding: 0;
+            background: inherit;
+            border: none;
+            color: #C91414;
+            cursor: pointer;
+
+            &:hover {
+                text-decoration:underline;
+            }
+
+            :disabled {
+                pointer-events: none;
+                cursor: not-allowed;
+            }
+        }
+
+        &-outline {
+            font-size:pxToRem(12);
+            background:$color-secondary;
+            color:$color-primary;
+            border:none;
+            border-radius:pxToRem(4);
+        }
+
+        &--sm {
+            padding:10px;
         }
     }
 }

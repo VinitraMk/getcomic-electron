@@ -4,7 +4,7 @@ export function isUrlValid(url) {
         isValid:true,
         isSeries:false
     }
-    var pattern = /\bhttps\:\/\/readcomiconline.to/;
+    var pattern = /\bhttps\:\/\/readcomiconline.[a-z]{2}/;
     if(pattern.test(url)) {
         let seriesName = getSeriesName(url);
         if(seriesName==="") {

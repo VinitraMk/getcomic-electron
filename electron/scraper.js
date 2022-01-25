@@ -8,14 +8,17 @@ var utils = require("util");
 const { Options } = require("selenium-webdriver/chrome");
 const { elementLocated, titleMatches } = require("selenium-webdriver/lib/until");
 
-exports.onSubmit = (url,seriesName) => { 
-    return onSubmit(url,seriesName).then(res=>{
-        return res;
-    });
-};
+//exports.onSubmit = (url,seriesName) => { 
+    //return onSubmit(url,seriesName).then(res=>{
+        //console.log('receiving results',res);
+        //if(res!==undefined) {
+            //return res;
+        //}
+    //});
+//};
 
 async function getSeriesSourceCode(url,seriesName) {
-    console.log('fetching code',url);
+    //console.log('fetching code',url);
     let options = new Options();
     options.addArguments("--headless");
     options.addArguments("--no-sandbox");
@@ -27,80 +30,113 @@ async function getSeriesSourceCode(url,seriesName) {
         var service = await new chrome.ServiceBuilder(driverPath).build();
         chrome.setDefaultService(service);
 
-        driver = await new webdriver.Builder()
+        let scraperDriver = await new webdriver.Builder()
         .forBrowser("chrome")
         .withCapabilities(webdriver.Capabilities.chrome())
         .setChromeOptions(options)
         .build();
-        
-        await driver.get(url);
-        console.log('driver build complete');
-        let pageSrc = "";
-        let issueResults = {};
-        //let titlePattern = /[A-Z]+[a-z]*[-)|]*[0-9]*Read [A-Z]*[a-z]* comic online in high quality/
-        //let el = driver.findElement(webdriver.By.id("container"));
 
-        await driver.wait(webdriver.until.titleContains("comic online")).then(src=>{
-            console.log('element found');
-            try {
-                driver.getPageSource().then(res=>{
-                    fs.writeFileSync("source.txt",res,(err)=>{
-                        if(err) throw err;
-                    });
-                    console.log("quiting driver...");
-                    driver.quit();
+        await scraperDriver.get(url);
+        console.log('driver build complete');
+
+        await scraperDriver.wait(webdriver.until.titleContains("comic online")).then(src=>{
+            //console.log('element found');
+            return (async() =>{
+                await scraperDriver.getPageSource().then(res=>{
+                    return (async()=>{
+                        console.log("writing into file, please wait...");
+                        return new Promise((resolve,reject)=>{
+                            fs.writeFile("source.txt",res,(err)=>{
+                                if(err) throw err;
+                                else {
+                                    resolve(res);
+                                    console.log('quitting driver...');
+                                    scraperDriver.quit();
+                                }
+                            });
+                        })
+                    })();
                 });
-            }
-            catch(err) {
-                console.log(err);
-                driver.quit();
-            }
+            })();
         })
         .catch(err=>{
-            driver.getTitle().then(title=>{
+            scraperDriver.getTitle().then(title=>{
                 console.log(title);
             }).catch(err=>{
                 console.log(err);
-                driver.quit();
+                scraperDriver.quit();
             });
             console.log(err);
-            driver.quit();
+            scraperDriver.quit();
         })
     }
-    catch{
-        console.log('error');
-        driver.quit();
+    catch(err) {
+        console.log('error',err);
+        scraperDriver.quit();
     }
 }
 
 function getListOfIssues(seriesName) {
-    if(fs.existsSync("source.txt")) {
-        console.log("source file found");
-        const $ = parser.load(fs.readFileSync("source.txt"));
+    if(fs.existsSync("./source.txt")) {
+        //console.log("source file found");
+        const $ = parser.load(fs.readFileSync("./source.txt"));
         let issueListTags = $('ul.list').children().toArray();
-        let issueLinks = [];
-        let issueTitles = [];
+        let issueList = [];
+        //let issueLinks = [];
+        //let issueTitles = [];
         issueListTags.forEach(item=>{
-            issueLinks.push(item.children[0].attribs["href"]);
+            //issueLinks.push(item.children[0].attribs["href"]);
+            let issueLink = item.children[0].attribs["href"];
+            let startIndex = issueLink.lastIndexOf("/")+1;
+            let endIndex = issueLink.indexOf("?");
+            let issueTitle = issueLink.substring(startIndex,endIndex);
+            issueList.push({
+                issueTitle:issueTitle,
+                issueLink:issueLink,
+                isDownloaded:false
+            });
         });
-        issueLinks.forEach(item=>{
-            let startIndex = item.lastIndexOf("/")+1;
-            let endIndex = item.indexOf("?");
-            let issueTitle = item.substring(startIndex,endIndex);
-            issueTitles.push(issueTitle);
-        })
+        
         let result = {
             comicName:seriesName,
-            issueTitle:issueTitles,
-            issueLinks:issueLinks
-        }
-        fs.unlinkSync("source.txt");
-        return result;
+            issueList:issueList
+        };
+
+        return (async() => 
+            {
+                try {
+                    fs.unlink("./source.txt",(err)=>{
+                        if(err) throw err;
+                        //console.log('removed file');
+                        //return result;
+                    });
+                    //console.log('removed file');
+                    return result;
+                }
+                catch(err) {
+                    if(err) {
+                        console.log(err);
+                        return;
+                    }
+                }
+            }
+        )();
+
     }
     else {
-        console.log("file not found :-(");
-        return null;
+        console.log('file does not exist');
     }
+    //return result;
+}
+
+function getListOfImageLinks(url) {
+    let options = new Options();
+    options.addArguments("--headless");
+    options.addArguments("--no-sandbox");
+    options.addArguments("--ignore-certificate-errors");
+    options.addArguments("--user-agent=foo");
+
+    
 }
 
 async function onSubmit(url,seriesName) {
@@ -112,4 +148,9 @@ async function onSubmit(url,seriesName) {
         console.log(err);
         return err;
     }); 
+}
+
+module.exports = {
+    onSubmit,
+    getListOfImageLinks,
 }

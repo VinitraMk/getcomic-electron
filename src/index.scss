@@ -1,3 +1,6 @@
+/* Sass imports for vendor files */
+@import '../node_modules/react-circular-progressbar/dist/styles.css';
+
 /* Sass imports for common class */
 @import "./react/assets/scss/common/variables";
 @import "./react/assets/scss/common/functions";
@@ -5,15 +8,21 @@
 @import "./react/assets/scss/common/colors";
 @import "./react/assets/scss/common/resets";
 @import "./react/assets/scss/common/errors";
+@import "./react/assets/scss/common/icons";
 
 /* Sass imports for components */
 @import "./react/assets/scss/components/input-controls";
 @import "./react/assets/scss/components/buttons";
 @import "./react/assets/scss/components/loader";
+@import "./react/assets/scss/components/table";
+@import "./react/assets/scss/components/dialog";
 
 /* Sass imports for layouts */
 @import "./react/assets/scss/layouts/root";
 @import "./react/assets/scss/layouts/container";
+
+/* Sass imports for overrides */
+@import "./react/assets/scss/overrides/overrides";
 
 /* Sass import for utilties */
 @import "./react/assets/scss/common/utilities";
