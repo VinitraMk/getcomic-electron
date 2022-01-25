@@ -19,7 +19,7 @@ Windows
 
 1. **Download the package from below and install package**  
     * **Download .exe from drive link**  
-    [Drive Link](https://drive.google.com/file/d/1ziPBOu0NjtSelHygSxVGakBNgOxRO67T/view?usp=sharing)
+    [Drive Link](https://drive.google.com/file/d/17anUEBb3d0YViv5d0_7cZ4A1zlH7GfWw/view?usp=sharing)
 
 ## Usage 
 
