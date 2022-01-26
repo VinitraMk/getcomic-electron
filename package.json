@@ -45,6 +45,7 @@
     "jest-resolve": "24.9.0",
     "jest-watch-typeahead": "0.4.2",
     "mini-css-extract-plugin": "0.9.0",
+    "mkdirp": "^1.0.4",
     "optimize-css-assets-webpack-plugin": "5.0.3",
     "path": "^0.12.7",
     "pdfkit": "^0.11.0",
@@ -63,6 +64,7 @@
     "request-promise": "^4.2.6",
     "resolve": "1.15.0",
     "resolve-url-loader": "3.1.1",
+    "robocopy": "^0.1.16",
     "sass-loader": "8.0.2",
     "selenium-webdriver": "^4.0.0-alpha.7",
     "semver": "6.3.0",
@@ -96,8 +98,9 @@
     "build": "node scripts/build.js",
     "test": "node scripts/test.js",
     "start-electron": "set ELECTRON_START_URL=http://localhost:3000 && electron --debug .",
-    "build-electron": "mkdirp build/electron build/src/shared && robocopy electron build/electron & robocopy src/shared build/src/shared",
-    "package": "electron-builder build --win -c.extraMetadata.main=build/electron/main.js --publish never"
+    "build-electron-win": "mkdirp build/electron build/src/shared && robocopy electron build/electron & robocopy src/shared build/src/shared",
+    "build-electron-linux": "mkdirp build/electron build/src/shared && cp electron build -r & cp src/shared build/src -r",
+    "package": "electron-builder build -c.extraMetadata.main=build/electron/main.js --publish never"
   },
   "eslintConfig": {
     "extends": "react-app"
