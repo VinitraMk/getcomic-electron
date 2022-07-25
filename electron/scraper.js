@@ -46,12 +46,12 @@ async function getSeriesSourceCode(url,seriesName) {
                     return (async()=>{
                         console.log("writing into file, please wait...");
                         return new Promise((resolve,reject)=>{
-                            fs.writeFile("source.txt",res,(err)=>{
+                            return fs.writeFile("source.txt",res,(err)=>{
                                 if(err) throw err;
                                 else {
                                     resolve(res);
                                     console.log('quitting driver...');
-                                    scraperDriver.quit();
+                                    return scraperDriver.quit();
                                 }
                             });
                         })
