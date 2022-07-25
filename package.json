@@ -2,7 +2,7 @@
   "productName": "Getcomic",
   "main": "electron/main.js",
   "name": "hello-electronreact",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "author": "VinitraMk",
   "description": "An electron app to download comics from readcomiconline",
   "private": true,

@@ -19,7 +19,7 @@ Linux
 ### Installation
 1. **Download the package from below and install package**  
     * Download .exe for **windows** from drive link
-    [Drive Link](https://drive.google.com/file/d/17anUEBb3d0YViv5d0_7cZ4A1zlH7GfWw/view?usp=sharing)
+    [Drive Link](https://drive.google.com/file/d/1-cdz4iTi_ghVx8vrOlv_epcUea9miEp3/view?usp=sharing)
     * Download package for **linux** from drive link
     [Drive link](https://drive.google.com/file/d/1-naAVb39o0byV4VxLlS7CAA3HrywmuYR/view?usp=sharing)
     **Note: This package will support any version upto chrome 104. Any version higher than that will not work in your system**
